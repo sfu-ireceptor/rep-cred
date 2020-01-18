@@ -4,3 +4,6 @@
 ~$
 ^data-raw
 ^docs
+install.R
+runApp.R
+runtime.txt
