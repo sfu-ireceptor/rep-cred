@@ -8,3 +8,5 @@ Ways to use:
 - From the command line: Rscript inst/repcred.R -r inst/extdata/ExampleDb.tsv -o tmp_repcred
 
 - In RStudio, create a new project with the report code, to be able to customize it: File > New Project > New directory > Repertoire Credibility Project
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/airr-community/rep-cred/master?urlpath=shiny/binder/)
