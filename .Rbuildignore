@@ -5,5 +5,5 @@
 ^data-raw
 ^docs
 install.R
-runApp.R
+app.R
 runtime.txt
