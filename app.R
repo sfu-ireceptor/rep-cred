@@ -1,5 +1,4 @@
 library(shiny)
-devtools::install_github("airr-community/rep-cred/", ref="master", dependencies=TRUE)
 dir <- system.file('shiny-app', package = 'repcred')
 setwd(dir)
 shiny::shinyAppDir('.')
