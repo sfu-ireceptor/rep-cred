@@ -1,0 +1,61 @@
+--- 
+title: "Credibility of a repertoire report"
+author: ""
+date: "Updated: `r date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: "references.bib"
+biblio-style: apalike
+link-citations: yes
+description: "Analysis notebook"
+output:
+    bookdown::gitbook:
+      config:  
+         fig_caption: yes
+         toc:
+            scroll_highlight: yes
+            collapse: subsection
+         download: no
+         sharing: no
+         keep_md: true
+params:
+   date: !r date()
+   echo:  FALSE
+   cache: FALSE
+   rep: !r system.file("extdata", "ExampleDb.tsv", package = "repcred")
+   outdir: !r tempdir()
+---
+
+```{r global-options, include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(fig.width=7, fig.height=4, 
+                      echo=params$echo,cache=params$cache,
+                      warning=FALSE, message=FALSE,
+                      out_dir=params$outdir,
+                      eval.opts = c('eval', 'echo', 'fig.height', 'fig.width'))
+library(repcred)
+library(airr)
+library(sumrep)
+library(plotly)
+```
+
+# Input parameters
+
+```{r input-parameters}
+params
+save(params, file=file.path(params$outdir,"params.RData"))
+```
+
+# Is a valid repertoire
+
+```{r}
+repertoire <- read_airr(params$rep)
+validate_airr(repertoire)
+```
+
+# sumrep
+
+```{r}
+sumrep_gc <- getGCContentDistribution(repertoire)
+ggplotly(ggplot(data.frame("GC_content"=sumrep_gc), aes(x=GC_content)) +
+   geom_freqpoly(binwidth=0.0001))
+```

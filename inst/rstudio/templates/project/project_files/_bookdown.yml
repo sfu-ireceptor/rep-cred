@@ -1,0 +1,11 @@
+output_dir: ./results
+delete_merged_file: true
+language:
+   label:
+      fig: 'Figure '
+      tab: 'Table '
+   ui:
+      chapter_name: ''
+rmd_files: ["index.Rmd",
+            "references.Rmd",
+            "versions.Rmd"]

@@ -1,0 +1,12 @@
+#div-main {
+    position:fixed;
+    top: calc(35%);
+    left: calc(35%);
+}
+
+.shiny-notification {
+    position:fixed;
+    top: calc(55%);
+    left: calc(35%);
+    width: 300px;
+}

@@ -1,0 +1,29 @@
+Package: repcred
+Type: Package
+Version: 0.0.0
+Date: 2020-01-01
+Authors@R: c(person("Susanna", "Marquez", role=c("aut", "cre"), 
+                    email="susanna.marquez@yale.edu"),
+                     person("AIRR Community", role=c("cph")))
+Title: Repertoire Credibility 
+Description: Tools to evaluate the credibility of immune repertoires
+License: CC BY-SA 4.0
+BugReports: https://github.com/airr-community/rep-cred
+LazyData: true
+BuildVignettes: true
+VignetteBuilder: knitr
+Encoding: UTF-8
+Depends:
+    R (>= 3.1.2),
+    shiny
+Imports:
+    airr,
+    bookdown,
+    dplyr,
+    knitr,
+    plotly,
+    rmarkdown,
+    sumrep
+Suggests:
+    testthat
+RoxygenNote: 6.1.1

@@ -1,0 +1,9 @@
+# R packages
+*.Rproj
+.Rproj.user
+.Rhistory
+man/
+**/vignettes/*.R
+**/vignettes/*.pdf
+**/vignettes/*.html
+.directory
