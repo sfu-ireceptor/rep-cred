@@ -47,8 +47,11 @@ save(params, file=file.path(params$outdir,"params.RData"))
 
 # Is a valid repertoire
 
-```{r}
+```{r warning=FALSE}
 repertoire <- read_airr(params$rep)
+```
+
+```{r warning=TRUE}
 validate_airr(repertoire)
 ```
 
