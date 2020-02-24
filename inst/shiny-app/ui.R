@@ -1,4 +1,5 @@
 # Define UI
+options(shiny.maxRequestSize = 0)
 ui <- fluidPage(
    
    tags$head(
