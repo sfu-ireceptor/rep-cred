@@ -1,5 +1,6 @@
 # R packages
 *.Rproj
+.Rdata
 .Rproj.user
 .Rhistory
 man/
