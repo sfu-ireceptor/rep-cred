@@ -55,6 +55,19 @@ repertoire <- read_airr(params$rep)
 validate_airr(repertoire)
 ```
 
+# Non-nucleotides in sequence
+
+```{r warning=FALSE}
+check_nucleotides(repertoire)
+
+g = plot_base_composition(repertoire$sequence_alignment, 'sequence_alignment - base composition')
+
+if(!is.na(g)) {
+   g
+}
+
+```
+
 # sumrep
 
 ```{r}
