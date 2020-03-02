@@ -15,6 +15,7 @@ output:
          toc:
             scroll_highlight: yes
             collapse: subsection
+            depth: 4            
          download: no
          sharing: no
          keep_md: true
@@ -64,7 +65,7 @@ check_nucleotides(repertoire)
 g <- plot_base_composition(repertoire$sequence_alignment, 'sequence_alignment - base composition')
 
 if(!is.na(g)) {
-   g
+   ggplotly(g)
 }
 
 ```

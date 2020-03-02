@@ -9,17 +9,21 @@ output:
     fig_width: 7.5
     highlight: pygments
     toc: yes
+    toc_depth: 3
   md_document:
     fig_height: 4
     fig_width: 7.5
     preserve_yaml: no
     toc: yes
+    toc_depth: 3
   html_document:
     fig_height: 4
     fig_width: 7.5
     highlight: pygments
     theme: readable
     toc: yes
+    toc_depth: 3
+    
 geometry: margin=1in
 fontsize: 11pt
 vignette: >
@@ -33,6 +37,9 @@ vignette: >
 TODO: describe package
 
 ## Usage
+
+There are several ways to generate the credibility repertoire. All of them use the same
+report template. 
 
 ### R function
 
