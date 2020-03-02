@@ -10,6 +10,10 @@ detail_nucleotide <- function(non, repertoire, non_nucs, total_pos) {
   cat(paste0("example sequence id: ", example_row$sequence_id, "\n", example_row$sequence))
 }
 
+
+#' Check nucleotides
+#' 
+#' @param repertoire Repertoire data.frame in AIRR format
 #' @export
 check_nucleotides <- function(repertoire) {
   non_nucs = str_replace_all(repertoire$sequence, "[ACGTacgt]", "")
