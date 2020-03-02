@@ -17,7 +17,6 @@ matrix:
         - roxygen2
         - testthat
       before_install:
-        - cd lang/R
         - R -e 'install.packages(c("alakazam", "ape", "CollessLike", "data.table", "devtools", "dplyr", "entropy", "HDMD", "jsonlite", "magrittr", "Peptides", "RecordLinkage", "roxygen2", "shazam", "seqinr", "stringdist", "stringr", "testthat", "textmineR", "yaml"))'
         - R -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) { install.packages("BiocManager") }; BiocManager::install("Biostrings")'
         - R -e 'devtools::install_github("matsengrp/sumrep", ref="master", dependencies=TRUE)'
