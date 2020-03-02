@@ -1,3 +1,4 @@
+#' Start the shiny app 
 #' @export
 repcredWeb <- function(appDir=system.file("shiny-app", 
                                           package = "repcred"), 
@@ -8,6 +9,19 @@ repcredWeb <- function(appDir=system.file("shiny-app",
     shiny::runApp(appDir, port=port, display.mode = "normal", launch.browser = T,...)
 }
 
+
+#' Generate Repertoire Credibility report
+#' 
+#' This funcion reads the repertoire file specified by \code{rep}
+#' and runs a set of sets to evaluate the credibility of the repertoire.
+#' 
+#' @param  rep Path to the repertoire file.
+#' @return Path to the credibility report. 
+#' 
+#' @examples
+#' 
+#' rep_file <- system.file(package="repcred", "extdata", "ExampleDb.tsv")
+#' repcred_report(rep_file, tempdir())
 #' @export
 repcred_report <- function(rep, outdir=NULL) {
     
@@ -30,7 +44,11 @@ repcred_report <- function(rep, outdir=NULL) {
     report_path
 }
 
-#' @export
+
+#' Render credibility report
+#' 
+#' @param rep Path to repertoire 
+#' @param outdir Directory where the report will be generated
 render_report <- function(rep, outdir) {
 
     if (!dir.exists(outdir)) {
@@ -57,9 +75,12 @@ render_report <- function(rep, outdir) {
 }
 
 
-#' Create a repcred project
+#' Create a Repertoire Credibility Project
+#' 
 #' From RStudio, use the New Project wizard: File > New Project >
 #' New Directory > then select  Repertoire Credibility Project
+#' to create the skeleton of a Repertoire Credibility Project
+#' @param  path path to the directorye where the project will be created
 repcred_project <- function(path,...) {
     skeleton_dir <- file.path(system.file(package="repcred"),"rstudio", "templates", "project", "project_files")
     project_dir <- path

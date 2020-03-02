@@ -1,7 +1,7 @@
 Package: repcred
 Type: Package
 Version: 0.0.0
-Date: 2020-01-01
+Date: 2020-03-02
 Authors@R: c(person("Susanna", "Marquez", role=c("aut", "cre"), 
                     email="susanna.marquez@yale.edu"),
                      person("AIRR Community", role=c("cph")))
@@ -23,7 +23,8 @@ Imports:
     knitr,
     plotly,
     rmarkdown,
+    stringr,
     sumrep
 Suggests:
     testthat
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2

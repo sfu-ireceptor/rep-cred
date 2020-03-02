@@ -28,4 +28,25 @@ vignette: >
   %\usepackage[utf8]{inputenc}
 ---
 
-## Hello world!
+## rep-cred
+
+TODO: describe package
+
+## Usage
+
+### R function
+
+TODO: Generate the report from R with `repcred_report()`
+
+### Shiny app
+
+TODO: Launch the shiny app from R with `repcredWeb`
+
+### RScript
+
+TODO: Use the RScript `repcred.R`.
+
+### RStudio
+
+TODO: Create a project skeleton from RStudio.
+

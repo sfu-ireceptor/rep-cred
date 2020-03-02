@@ -36,6 +36,7 @@ library(repcred)
 library(airr)
 library(sumrep)
 library(plotly)
+library(stringr)
 ```
 
 # Input parameters
@@ -60,7 +61,7 @@ validate_airr(repertoire)
 ```{r warning=FALSE}
 check_nucleotides(repertoire)
 
-g = plot_base_composition(repertoire$sequence_alignment, 'sequence_alignment - base composition')
+g <- plot_base_composition(repertoire$sequence_alignment, 'sequence_alignment - base composition')
 
 if(!is.na(g)) {
    g

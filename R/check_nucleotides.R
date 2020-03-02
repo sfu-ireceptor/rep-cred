@@ -1,8 +1,5 @@
 # Check for presence of nucleotides other than ACGT. If found, give statistics and examples
 
-library(stringr)
-
-
 detail_nucleotide <- function(non, repertoire, non_nucs, total_pos) {
   occs = str_count(non_nucs, non)
   n_rows = sum(occs != 0)
@@ -53,7 +50,7 @@ nucs_at = function(seqs, pos, filter) {
   return(ret)
 }
 
-
+#' @export
 plot_base_composition = function(recs, title, pos=1, end_pos=999, r_justify=F) {
   max_pos = nchar(recs[1])
   
