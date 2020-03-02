@@ -1,0 +1,30 @@
+matrix:
+  include:
+    - language: r
+      r:
+        - release
+      sudo: false
+      cache: packages
+      addons:
+        apt:
+          packages:
+            - libgit2-dev
+            - libssl-dev
+            - libxml2-dev
+      r_check_args: --as-cran --run-donttest
+      r_binary_packages:
+        - devtools
+        - roxygen2
+        - testthat
+      before_install:
+        - cd lang/R
+        - R -e 'install.packages(c("alakazam", "ape", "CollessLike", "data.table", "devtools", "dplyr", "entropy", "HDMD", "jsonlite", "magrittr", "Peptides", "RecordLinkage", "roxygen2", "shazam", "seqinr", "stringdist", "stringr", "testthat", "textmineR", "yaml"))'
+        - R -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) { install.packages("BiocManager") }; BiocManager::install("Biostrings")'
+        - R -e 'devtools::install_github("matsengrp/sumrep", ref="master", dependencies=TRUE)'
+      install:
+        - R -e 'devtools::install_deps(dep=T)'
+      before_script:
+        - R -e 'devtools::document()'
+      script:
+        - R CMD build .
+        - R CMD check *tar.gz --as-cran --run-donttest 
