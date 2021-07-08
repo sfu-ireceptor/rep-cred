@@ -4,9 +4,12 @@ server <- function(input, output) {
       repcred_report_path=NULL
    )
    
-   output$openResultsBtn <- renderUI({
+   
+   
+   observeEvent(input$go, {
+      output$openResultsBtn <- renderUI({
       
-      req(input$file1)
+      #req(input$file1)
       withProgress(
          tryCatch(
             {
@@ -30,4 +33,7 @@ server <- function(input, output) {
          )
       }
    })
+      })
+   
+   
 }

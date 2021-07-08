@@ -12,14 +12,39 @@ ui <- fluidPage(
       column(12,
              align="center",
              # App title
-             titlePanel("repcred"),
+             titlePanel("Repcred"),
              # Input
              fileInput("file1", "Choose TSV File",
                        multiple = FALSE,
                        accept = c("text/tab-separated-values",
                                   ".tsv", "text/plain")),
+            #Genome file upload
+            
+            checkboxInput("input_chk", "Upload", value = FALSE ),
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            #Checkbox for tests    
+            checkboxGroupInput("rb", "Choose which tests to run:",
+                       choiceNames = list("SumRep" , "Basic Checks" , "All Checks"),
+                       choiceValues = list(
+                          "sumrep", "simple checks", "all"
+           )),
+           
+           actionButton("go", "Test Repertoire"),
+             
             # Output
             uiOutput("openResultsBtn")
       )
-   )
+   ),
+   
+   
+   
 )
+
