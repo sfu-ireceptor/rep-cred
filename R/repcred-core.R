@@ -50,7 +50,7 @@ repcred_report <- function(rep, outdir=NULL) {
 #' @param rep Path to repertoire 
 #' @param outdir Directory where the report will be generated
 render_report <- function(rep, outdir) {
-
+    path = "../rstudio/templates/project/project_files/"
     if (!dir.exists(outdir)) {
         dir.create(outdir, recursive = T)
     }
@@ -60,17 +60,18 @@ render_report <- function(rep, outdir) {
     # Create project in outdir
     invisible(repcred_project(outdir))
     
+    setwd("../rstudio/templates/project/project_files/")
+    
+    
     # render
-    xfun::in_dir(
-        outdir,
-        book <- bookdown::render_book(
-            "index.Rmd",
-            output_format='bookdown::gitbook',
-            config_file = "_bookdown.yml",
-            clean=FALSE,
-            new_session=FALSE, clean_envir=FALSE,
-            params=list("rep"=rep, outdir=outdir))
-    )
+    book <- bookdown::render_book(
+        input = ".",
+        output_format='bookdown::gitbook',
+        config_file ="_bookdown.yml",
+        clean=FALSE,
+        new_session=FALSE, clean_envir=FALSE,
+        params=list("rep"=rep, outdir=outdir))
+
     book
 }
 

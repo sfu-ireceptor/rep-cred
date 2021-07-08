@@ -16,7 +16,7 @@ output:
             scroll_highlight: yes
             collapse: subsection
             depth: 4            
-         download: no
+         download: yes
          sharing: no
          keep_md: true
 params:
@@ -62,18 +62,13 @@ validate_airr(repertoire)
 ```{r warning=FALSE}
 check_nucleotides(repertoire)
 
-g <- plot_base_composition(repertoire$sequence_alignment, 'sequence_alignment - base composition')
-
-if(!is.na(g)) {
-   ggplotly(g)
-}
 
 ```
 
 # sumrep
 
-```{r}
-sumrep_gc <- getGCContentDistribution(repertoire)
-ggplotly(ggplot(data.frame("GC_content"=sumrep_gc), aes(x=GC_content)) +
-   geom_freqpoly(binwidth=0.0001))
+```{r warning=FALSE}
+
+hist(rnorm(1:20,3,1))
+
 ```
