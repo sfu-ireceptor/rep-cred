@@ -63,12 +63,24 @@ validate_airr(repertoire)
 check_nucleotides(repertoire)
 
 
+
 ```
 
-# sumrep
+# Sumrep
 
 ```{r warning=FALSE}
 
-hist(rnorm(1:20,3,1))
+
 
 ```
+
+#  Possible Chimerisms
+
+```{r warning = TRUE}
+
+
+
+```
+
+
+

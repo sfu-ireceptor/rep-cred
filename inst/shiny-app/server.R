@@ -5,6 +5,19 @@ server <- function(input, output) {
    )
    
    
+   output$conditionalInput <- renderUI({
+      if(input$input_chk){
+       fileInput("genome" , "Please Upload genome file")  
+      }
+      
+   })
+   
+   
+    
+   
+      
+   
+   
    
    observeEvent(input$go, {
       output$openResultsBtn <- renderUI({
