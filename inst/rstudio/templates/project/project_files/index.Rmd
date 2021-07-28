@@ -69,7 +69,13 @@ check_nucleotides(repertoire)
 # Sumrep
 
 ```{r warning=FALSE}
-
+if(GenomeFileUploaded == TRUE){
+#sumrep scripts that require the genome file   
+   
+}else{
+#sumrep scripts that do not require the genome file
+   
+}
 
 
 ```

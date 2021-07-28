@@ -20,31 +20,33 @@ ui <- fluidPage(
                                   ".tsv", "text/plain")),
             #Genome file upload
             
-            checkboxInput("input_chk", "Upload", value = FALSE ),
+            checkboxInput("input_chk", "Upload genome file?", value = FALSE ),
             
             
-            #test
-            
+            uiOutput("conditionalInput"),
             
             
             
             
             
             #Checkbox for tests    
-            checkboxGroupInput("rb", "Choose which tests to run:",
-                       choiceNames = list("SumRep" , "Basic Checks" , "All Checks"),
-                       choiceValues = list(
-                          "sumrep", "simple checks", "all"
-           )),
+            selectInput("rb", "Choose which tests to run:",
+                       choices = list("SumRep" , "Basic Checks" , "All Checks"),
+                       multiple = TRUE  )),
+      
+            #Checks for chimeric sequences : 
+            selectInput("rb", "Choose which chimeric test you would like to run:",
+                        choices = list("Basic chimera check", "Thorough Chimera check") ,
+                        multiple = FALSE  )),
            
            actionButton("go", "Test Repertoire"),
              
             # Output
             uiOutput("openResultsBtn")
       )
-   ),
+   )
    
    
    
-)
+
 
