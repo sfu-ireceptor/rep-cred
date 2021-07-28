@@ -23,7 +23,7 @@ params:
    date: !r date()
    echo:  FALSE
    cache: FALSE
-   rep: !r system.file("extdata", "ExampleDb.tsv", package = "repcred")
+   rep:  !r system.file("extdata", "ExampleDb.tsv", package = "repcred")
    outdir: !r tempdir()
 ---
 
@@ -51,6 +51,7 @@ save(params, file=file.path(params$outdir,"params.RData"))
 
 ```{r warning=FALSE}
 repertoire <- read_airr(params$rep)
+
 ```
 
 ```{r warning=TRUE}
@@ -60,7 +61,7 @@ validate_airr(repertoire)
 # Non-nucleotides in sequence
 
 ```{r warning=FALSE}
-check_nucleotides(repertoire)
+#check_nucleotides(repertoire)
 
 
 
@@ -68,16 +69,8 @@ check_nucleotides(repertoire)
 
 # Sumrep
 
-```{r warning=FALSE}
-if(GenomeFileUploaded == TRUE){
-#sumrep scripts that require the genome file   
-   
-}else{
-#sumrep scripts that do not require the genome file
-   
-}
-
-
+```{r warning=TRUE}
+pairwiseDistanceInfo(repertoire)
 ```
 
 #  Possible Chimerisms
