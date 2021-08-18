@@ -44,7 +44,7 @@ ui <- fluidPage(
             # Output
             uiOutput("openResultsBtn")
       )
-   )
+   
    
    
    

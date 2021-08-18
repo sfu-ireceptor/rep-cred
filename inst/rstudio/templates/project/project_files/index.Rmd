@@ -70,7 +70,7 @@ validate_airr(repertoire)
 # Sumrep
 
 ```{r warning=TRUE}
-pairwiseDistanceInfo(repertoire)
+CDR3pairwiseDistanceInfo(repertoire)
 ```
 
 #  Possible Chimerisms

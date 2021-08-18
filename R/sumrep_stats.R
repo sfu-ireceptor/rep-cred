@@ -35,9 +35,9 @@ readInStatsData <- function(function_nm){
 }
 
 
-pairwiseDistanceInfo <- function(data){
+CDR3pairwiseDistanceInfo <- function(data){
   
-  pairwise_distance = getPairwiseDistanceDistribution(data)
+  pairwise_distance = getCDR3PairwiseDistanceDistribution(data)
   
   
   hist(pairwise_distance)
@@ -57,11 +57,14 @@ pairwiseDistanceInfo <- function(data){
   
   ##
   
-  hist(pairwise_distance)
+  hist(pairwise_distance,main="Histogram of CDR3 pairwise distance" , xlab="CDR3 Pairwise distance")
   abline(v=exp_perc_5,col=" orange")
   abline(v=exp_perc_95,col="orange")
   abline(v=quantile_5,col="blue")
   abline(v=quantile_95,col="blue")
+  abline(v=exp_min , col="red")
+  abline(v=exp_max , col="red")
+  legend("topright",c("Current Rep quantiles","Expected Quantiles","Expected Min and Max"),fill=c("blue","orange","red"))
   
   
 }
