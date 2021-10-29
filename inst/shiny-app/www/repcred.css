@@ -10,3 +10,8 @@
     left: calc(35%);
     width: 300px;
 }
+
+.book .book-summary {
+	color:pink;
+	width: 35px;
+}

@@ -7,43 +7,49 @@ ui <- fluidPage(
    ),
    
    # Sidebar layout
-   fluidRow(
-      id="div-main",
-      column(12,
-             align="center",
+   sidebarLayout(
+      sidebarPanel(align="center",
              # App title
-             titlePanel("Repcred"),
+             fluidRow(titlePanel("Repcred"),
+             #Help Button
+             actionButton("help" , "Help")),
+             br(),
              # Input
-             fileInput("file1", "Choose TSV File",
+             fileInput("file1", "Choose TSV File (REQUIRED)",
                        multiple = FALSE,
                        accept = c("text/tab-separated-values",
                                   ".tsv", "text/plain")),
-            #Genome file upload
+            #Genome fasta file upload
             
-            checkboxInput("input_chk", "Upload genome file?", value = FALSE ),
+            checkboxInput("input_chk", "Upload germline reference set?", value = FALSE ),
+            uiOutput("condInput"),
             
-            
-            uiOutput("conditionalInput"),
-            
-            
-            
+            selectInput("sumrep" , "Select Sumrep stats to run. Full stats takes longer to run but gives pairwise statistics , Basic statistics is faster but contains less statistics." , choices=c("Full sumrep stats" , "Basic sumrep stats")),
+            selectInput("seq_type" , "How would you like the sequences to be displayed as?", choices=list("Amino Acid Sequence","Nucleotide Sequences"), multiple=FALSE),
             
             
-            #Checkbox for tests    
-            selectInput("rb", "Choose which tests to run:",
-                       choices = list("SumRep" , "Basic Checks" , "All Checks"),
-                       multiple = TRUE  )),
-      
-            #Checks for chimeric sequences : 
-            selectInput("rb", "Choose which chimeric test you would like to run:",
-                        choices = list("Basic chimera check", "Thorough Chimera check") ,
-                        multiple = FALSE  )),
-           
+            
+            
+            
+          
            actionButton("go", "Test Repertoire"),
              
             # Output
             uiOutput("openResultsBtn")
+           
+      ),
+      
+      
+      mainPanel = ({
+         htmlOutput("help_info")
+         }
       )
+      
+      )
+   
+   
+   
+   )
    
    
    
