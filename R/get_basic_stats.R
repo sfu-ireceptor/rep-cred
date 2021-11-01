@@ -27,7 +27,7 @@ for (seq in data$sequence) {
 #'repertoire
 #'@param data repertoire file in data table format
 getSequenceLengths <- function(data){
-  sequence_lengths <- vector(size=length(data$sequence))
+  sequence_lengths <- vector(length=length(data$sequence))
   i=0
   for(seq in data$sequence){
     sequence_lengths[i] = nchar(seq)

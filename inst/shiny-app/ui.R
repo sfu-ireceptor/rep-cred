@@ -25,10 +25,7 @@ ui <- fluidPage(
             uiOutput("condInput"),
             
             selectInput("sumrep" , "Select Sumrep stats to run. Full stats takes longer to run but gives pairwise statistics , Basic statistics is faster but contains less statistics." , choices=c("Full sumrep stats" , "Basic sumrep stats")),
-            selectInput("seq_type" , "How would you like the sequences to be displayed as?", choices=list("Amino Acid Sequence","Nucleotide Sequences"), multiple=FALSE),
-            
-            
-            
+          
             
             
           

@@ -23,7 +23,7 @@ repcredWeb <- function(appDir=system.file("shiny-app",
 #' rep_file <- system.file(package="repcred", "extdata", "ExampleDb.tsv")
 #' repcred_report(rep_file, tempdir())
 #' @export
-repcred_report <- function(rep, outdir=NULL,genome_file,seq_type,sumrep) {
+repcred_report <- function(rep, outdir=NULL,genome_file,sumrep) {
     
     if (file.exists(rep)) {
         if (is.null(outdir)) {
@@ -35,7 +35,7 @@ repcred_report <- function(rep, outdir=NULL,genome_file,seq_type,sumrep) {
     
     tryCatch(
         {
-            report_path <- render_report(rep, outdir,genome_file,seq_type,sumrep)
+            report_path <- render_report(rep, outdir,genome_file,sumrep)
         },
         error = function(e) {
             stop(safeError(e))
@@ -90,7 +90,7 @@ getCoreStats <- function(data){
 #' 
 #' @param rep Path to repertoire 
 #' @param outdir Directory where the report will be generated
-render_report <- function(rep, outdir,genome,seq,sumrep) {
+render_report <- function(rep, outdir,genome,sumrep) {
     path = "../rstudio/templates/project/project_files/"
     if (!dir.exists(outdir)) {
         dir.create(outdir, recursive = T)
@@ -111,7 +111,7 @@ render_report <- function(rep, outdir,genome,seq,sumrep) {
         config_file ="_bookdown.yml",
         clean=FALSE,
         new_session=FALSE, clean_envir=FALSE,
-        params=list("rep"=rep, outdir=outdir,"genome_file"=genome,seq_type=seq,full_or_basic=sumrep))
+        params=list("rep"=rep, outdir=outdir,"genome_file"=genome,full_or_basic=sumrep))
 
     book
 }

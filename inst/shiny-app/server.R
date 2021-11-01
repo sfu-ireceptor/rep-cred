@@ -44,7 +44,7 @@ server <- function(input, output) {
       withProgress(
          tryCatch(
             {
-               dataValues$repcred_report_path <- repcred_report(input$file1$datapath,genome_file=input$genome$datapath,seq_type = input$seq_type,sumrep = input$sumrep)
+               dataValues$repcred_report_path <- repcred_report(input$file1$datapath,genome_file=input$genome$datapath,sumrep = input$sumrep)
                
             },
             error = function(e) {

@@ -27,7 +27,6 @@ params:
    rep:  !r system.file("extdata", "ExampleDb.tsv", package = "repcred")
    outdir: !r tempdir()
    genome_file: !r FALSE
-   seq_type: !r FALSE
    full_or_basic: !r FALSE
 ---
 
@@ -156,7 +155,8 @@ kbl(genes_present)
 
 
 ```{r warning=TRUE,results="asis"}
-if(gene_data != FALSE){
+if(is.list(gene_data)){
+print(typeof(gene_data))
 fasta_genes <- readInGeneNamesIMGTFasta(gene_data)
 gene_freq_table = geneCount(genes_present,fasta_genes)
 gene_freq_table=gene_freq_table[gene_freq_table$gene_count>0,]
@@ -175,8 +175,8 @@ allele_link=gene_tables[[2]]
 gene_allele_freq_table=data.frame(table(allele_link$gene,allele_link$allele))
 gene_allele_freq_table = gene_allele_freq_table[gene_allele_freq_table$Freq>0,]
 gene_allele_freq_table$Var1 <- as.factor(gene_allele_freq_table$Var1)
-ggplot(gene_allele_freq_table,aes(x=Var1,y=Freq,fill=Var2))+geom_bar(stat="identity")+guides(fill = "none", x=guide_axis(angle=90))+labs(x="Gene",y="Number of alleles present") 
-kbl(allele_link)    
+ggplot(gene_allele_freq_table,aes(x=Var1,y=Freq,fill=Var2))+geom_bar(stat="identity")+guides(fill = "none", x=guide_axis(angle=90))+labs(x="Gene",y="Number of alleles present")
+kbl(allele_link)
 }else{
    writeLines("No reference genome uploaded.")
 }
