@@ -10,25 +10,28 @@ link-citations: yes
 description: "Analysis notebook"
 output:
     bookdown::gitbook:
+      css: repcred.css 
       config:  
          fig_caption: yes
          toc:
             scroll_highlight: yes
             collapse: subsection
             depth: 4            
-         download: no
+         download: yes
          sharing: no
          keep_md: true
 params:
    date: !r date()
    echo:  FALSE
    cache: FALSE
-   rep: !r system.file("extdata", "ExampleDb.tsv", package = "repcred")
+   rep:  !r system.file("extdata", "ExampleDb.tsv", package = "repcred")
    outdir: !r tempdir()
+   genome_file: !r FALSE
+   full_or_basic: !r FALSE
 ---
 
 ```{r global-options, include=FALSE, cache=FALSE}
-knitr::opts_chunk$set(fig.width=7, fig.height=4, 
+knitr::opts_chunk$set(fig.width=7, fig.asp=0.7, 
                       echo=params$echo,cache=params$cache,
                       warning=FALSE, message=FALSE,
                       out_dir=params$outdir,
@@ -38,42 +41,308 @@ library(airr)
 library(sumrep)
 library(plotly)
 library(stringr)
+library(ggplot2)
+library(data.table)
+library(seqinr)
+library(kableExtra)
 ```
 
-# Input parameters
+#  Input parameters 
 
 ```{r input-parameters}
-params
+gene_data = NA
 save(params, file=file.path(params$outdir,"params.RData"))
+if(is.null(params$genome_file)){
+  gene_data = FALSE
+}else{
+ gene_data <-  seqinr::read.fasta(params$genome_file, as.string = TRUE,whole.header = TRUE)   
+}
+
+if(params$full_or_basic == "Full sumrep stats"){
+   full_check=TRUE
+}else{
+   full_check = FALSE
+}
+
+#Below variables are set to give the orange , green and red colours. These colours were used as it makes the text easier to read and are more muted than the regular red , orange and green.
+green = "LightGreen"
+amber = "NavajoWhite"
+red = "pink"
 ```
 
-# Is a valid repertoire
 
 ```{r warning=FALSE}
 repertoire <- read_airr(params$rep)
+repertoire <- as.data.table(repertoire)
+repertoire_dt <-fread(params$rep)
 ```
-
-```{r warning=TRUE}
+# Quality Control Stats
+```{r warning=TRUE,results="asis"}
 validate_airr(repertoire)
+writeLines("<h3> Columns with missing / No data </h3> ")
+kbl(data.table(column_name = findMissingColumns(repertoire)))
+print(params$full_or_basic)
 ```
 
 # Non-nucleotides in sequence
 
 ```{r warning=FALSE}
 check_nucleotides(repertoire)
+```
 
-g <- plot_base_composition(repertoire$sequence_alignment, 'sequence_alignment - base composition')
+# Statistics
+Below provides useful statistics about your repertoire:
 
-if(!is.na(g)) {
-   ggplotly(g)
+```{r warning=TRUE}
+prod_data <-getFullRatioNonProductive(repertoire)
+values = c(prod_data[[1]],prod_data[[2]],prod_data[[3]])
+labels = c("Productive","Non-productive","NA/Not specified")
+prod_info = data.table(a=values[[1]],b=values[[2]],c=values[[3]])
+setnames(prod_info,labels)
+barplot(values,names.arg = labels,col='light blue',ylab="Occurences" ,main="Number of productive vs non-productive sequences in repertoire file" )
+kbl(prod_info)
+```
+
+```{r warning=TRUE}
+if(getFullRatioNonProductive(repertoire)$non_prod != 0){
+ ambig_non_prod_data <- fullCheckNonProductiveSeqs(repertoire_dt)
+print(ambig_non_prod_data)
+kbl(ambig_non_prod_data)
+ total_num=prod_data[[2]]
+values = c(ambig_non_prod_data[[1]],ambig_non_prod_data[[2]],ambig_non_prod_data[[3]],total_num)
+
+labels = c("Contain non-coding bases","Contain stop codons","Other non-normal sequences","Total number non-productive")
+non_prod_table= data.table(a=values[[1]],b=values[[2]],c=values[[3]],d=total_num)
+setnames(non_prod_table,labels)
+par(mar=c(8, 13 ,5 ,3))
+barplot(values,names.arg = labels,col="light blue",xlab="Occurences" ,main="Non-productive sequence issues overview",cex.names=1 ,horiz=TRUE,las=2)
+knitr::kable(as.data.table(ambig_non_prod_data),col.names = labels)
+# 
+ kbl(non_prod_table) %>% kableExtra::column_spec(1,color="white",background=getPercColor(total_num,values[[1]])) %>% column_spec(2,color="white",background=getPercColor(total_num,values[[2]])) %>% column_spec(3,color="white",background=getNormalSeqNumColor(total_num,values[[3]]))
+}else{
+   print("There were no non-productive sequences present in the dataset")
+}
+
+
+```
+
+```{r warning=FALSE,results="asis"}
+
+sequence_length_data <- getSequenceLengths(repertoire)
+hist(sequence_length_data,main="Histogram of sequence lengths" , xlab = "Sequence Length")
+num_seqs_with_noncoding_vals <- getNumAmbiguousSeqs(repertoire_dt)
+kbl(getCoreStats(sequence_length_data))
+
+
+#getSequenceCoverage(repertoire,gene_data)
+
+#clusters=findAmplificationAreas(repertoire)
+#knitr::kable(as.data.table(clusters),col.names = labels)
+```
+\n
+Percentage of sequences where the V and J region are in-frame:
+```{r , comment=NA,results="asis"}
+writeLines(paste(getInFramePercentage(repertoire),"%"))
+
+```
+
+# Gene Usage Statistics
+
+```{r warning=TRUE,results="asis"}
+genes_present <- getGeneData(repertoire_dt)
+kbl(genes_present)
+```
+
+
+```{r warning=TRUE,results="asis"}
+if(is.list(gene_data)){
+print(typeof(gene_data))
+fasta_genes <- readInGeneNamesIMGTFasta(gene_data)
+gene_freq_table = geneCount(genes_present,fasta_genes)
+gene_freq_table=gene_freq_table[gene_freq_table$gene_count>0,]
+gene_tables=getUniqueGenes(gene_freq_table)
+genes_only_freq_table = gene_tables$unique_genes_list
+kbl(gene_freq_table)
+
+
+number_unqiue_alleles = length(gene_freq_table$gene_name)
+number_unqiue_genes = length(genes_only_freq_table$gene_name)
+labels=c("Number of unique alleles present for all genes" , "Number of unique genes present")
+values=c(number_unqiue_alleles,number_unqiue_genes)
+###
+kbl(gene_tables[[1]])
+allele_link=gene_tables[[2]]
+gene_allele_freq_table=data.frame(table(allele_link$gene,allele_link$allele))
+gene_allele_freq_table = gene_allele_freq_table[gene_allele_freq_table$Freq>0,]
+gene_allele_freq_table$Var1 <- as.factor(gene_allele_freq_table$Var1)
+ggplot(gene_allele_freq_table,aes(x=Var1,y=Freq,fill=Var2))+geom_bar(stat="identity")+guides(fill = "none", x=guide_axis(angle=90))+labs(x="Gene",y="Number of alleles present")
+kbl(allele_link)
+}else{
+   writeLines("No reference genome uploaded.")
 }
 
 ```
 
-# sumrep
+# General Sumrep Statistics
 
-```{r}
-sumrep_gc <- getGCContentDistribution(repertoire)
-ggplotly(ggplot(data.frame("GC_content"=sumrep_gc), aes(x=GC_content)) +
-   geom_freqpoly(binwidth=0.0001))
+```{r warning=TRUE,results="asis"}
+
+plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
+legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
+    
+gcContentDistribution(repertoire)
+positionDistancesBetweenMutationDistribution(repertoire)
+distanceFromGermlineToSequenceDistribution(repertoire)
 ```
+
+
+#  Pairwise Statistics
+
+```{r warning=TRUE,results="asis"}
+if(isTRUE(full_check)){
+ plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
+legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
+CDR3pairwiseDistanceInfo(repertoire)
+pairwiseDistDistribution(repertoire)
+nearestNeighbourDistInfo
+}else{
+   writeLines("Only the basic statistics were run.Please see other sections for the other statistics.")
+}
+
+
+```
+
+#  Physiochemical Statistics
+
+```{r warning=TRUE,results="asis"}
+plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
+legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
+#polarityDistribution(repertoire)
+#aromaticityDistribution(repertoire)
+#acidityDistribution(repertoire)
+#basicityDistribution(repertoire)
+# bulkinessDistribution(repertoire)
+# chargeDistribution(repertoire)
+aliphaticDistribution(repertoire)
+GRAVYDistribution(repertoire)
+
+```
+
+
+#  Insertion Length Distributions
+
+```{r warning=TRUE,results="asis"}
+plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
+legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
+
+VDinsertionLengthDistribution(repertoire)
+DJinsertionLengthDistribution(repertoire)
+VJinsertionLengthDistribution(repertoire)
+```
+
+#  Prime deletion Distributions Statistics
+
+```{r warning=TRUE,results="asis"}
+plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
+legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
+
+##
+if("v_3p_del" %in% colnames(repertoire)&!any(is.na(repertoire$v_3p_del))){
+ VGene3PrimeDeletionLengthDistribution(repertoire)  
+}else{
+   writeLines("Missing column : v_3p_del , Cannot run statistic \n")
+}
+if("v_5p_del" %in% colnames(repertoire)&!any(is.na(repertoire$v_5p_del))){
+ VGene5PrimeDeletionLengthDistribution(repertoire) 
+}else{
+   writeLines("Missing column : v_5p_del , Cannot run statistic \n")
+}
+##
+if("d_3p_del" %in% colnames(repertoire)&!any(is.na(repertoire$d_3p_del))){
+DGene3PrimeDeletionLengthDistribution(repertoire)
+}else{
+   writeLines("Missing column : d_3p_del , Cannot run statistic \n")
+}
+if("d_5p_del" %in% colnames(repertoire)&!any(is.na(repertoire$d_5p_del))){
+DGene5PrimeDeletionLengthDistribution(repertoire)
+}else{
+   writeLines("Missing column : d_5p_del , Cannot run statistic \n")
+}
+##
+if("j_3p_del" %in% colnames(repertoire)&!any(is.na(repertoire$j_3p_del))){
+JGene3PrimeDeletionLengthDistribution(repertoire)
+}else{
+   writeLines("Missing column : j_3p_del , Cannot run statistic \n")
+}
+if("j_5p_del" %in% colnames(repertoire)&!any(is.na(repertoire$j_5p_del))){
+JGene5PrimeDeletionLengthDistribution(repertoire)
+}else{
+   writeLines("Missing column : j_5p_del , Cannot run statistic \n")
+}
+
+```
+
+
+
+#  Possible Chimerisms
+Below table shows the comparison between the total number of sequences compares to the total number of unique CDR3 sequences and then compared to the number of CDR3 sequences that have multiple different v-call genes associated with them.
+```{r CDR3_Chimera_Check, warning = TRUE ,fig.width=9}
+cdr3_seq_info = checkCDR3(repertoire_dt)
+
+#table(cdr3_seq_info$cdr3_seq)
+cdr3_vcalls = getVCalls(cdr3_seq_info,repertoire,FALSE)
+total_num_unique_seq = length(unique(repertoire_dt$sequence))
+##
+num_uniq_cdr3_seq = length(unique(cdr3_seq_info$cdr3_seqs))
+
+num_occur_multiple_gene_call <- length(which(data.frame(table(cdr3_seq_info$cdr3_seqs))$Freq > 1))
+kbl(cdr3_vcalls)
+
+####
+# 
+ freq_table= data.frame(table(as.character(cdr3_vcalls$seq),as.character(cdr3_vcalls$v_call_genes)))
+ freq_table= freq_table[freq_table$Freq >1,]
+
+multiple_gene_calls = length(table(freq_table$Var1))
+#print(freq_table)
+seqs_stats_vals=c(total_num_unique_seq,num_uniq_cdr3_seq,multiple_gene_calls)
+labels = c("Unique complete seqs" , "Unique CDR3 seqs" , "Unique CDR3 seqs with multiple single v-calls" )
+
+##
+par(mar=c(8, 13 ,5 ,3))
+barplot(seqs_stats_vals,names.arg = labels,col='dark blue',xlab="Occurences" ,main="CDR3 Sequence comparisons", las=2, horiz=TRUE ,cex.names=0.8)
+
+
+freq_table$Var2 <- as.factor(freq_table$Var2)
+ggplot(freq_table,aes(x=Var2,y=Freq,fill=Var1))+geom_bar(stat="identity")+guides(fill = "none", x=guide_axis(angle=90))+labs(x="Gene",y="Number of sequences present")
+
+```
+
+
+Below contain CDR3 sequences with more than one v_call:
+
+```{r warning = TRUE, results="asis" } 
+options(width = 2000)
+num_to_display=0
+if(length(repertoire_dt$sequence)>100000){
+   num_to_display = 3
+}else{
+   num_to_display = 6
+}
+
+# if(seq_type == "")
+# display_type
+
+plotVgeneDist(cdr3_vcalls,num_to_display, "aa",freq_table)
+#kbl(most_chimeric)
+```
+
+# Find areas of amplification
+
+```{r warning = TRUE, results="asis"}
+#kbl(as.data.table(findAmplificationAreas(repertoire)))
+print(getwd())
+addTrafficLighting(c("pink","NavajoWhite","LightGreen"))
+```
+
+
