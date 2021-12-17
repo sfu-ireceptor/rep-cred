@@ -105,8 +105,6 @@ getVCalls<- function(cdr3_seqs_info,original_data,include_ambiguous_calls){
     
 
     }
-  #Below line removes the already sorted sequences so there are no duplicate checks
-  #------------------------------------#
   
   if(length(v_call_genes)!=0){
    seq_and_v_call = cbind(seq,v_call_genes,seq_ids)
@@ -117,6 +115,8 @@ getVCalls<- function(cdr3_seqs_info,original_data,include_ambiguous_calls){
   }
   return(as.data.table(joint))
   }
+
+
 
 #'The function below takes input of the data table from the function 'getVCalls'
 #' and using that and the frequency table it creates plots for a section of them.
@@ -142,7 +142,6 @@ plotVgeneDist <- function(cdr3_data_table,num_of_results_to_show,aa_or_nn,freq_t
   seq_v_gene_count = data.table(seqs=seq,v_gene_count=count)
   
   seq_v_gene_count = seq_v_gene_count[order(seq_v_gene_count$v_gene_count,decreasing = TRUE),] #Ordered list
-  #print(seq_v_gene_count[1:10,])
   
   i=1
   while(i<=num_of_results_to_show & i<=length(seq_v_gene_count$seqs)){
@@ -161,6 +160,8 @@ plotVgeneDist <- function(cdr3_data_table,num_of_results_to_show,aa_or_nn,freq_t
     
     
     i=i+1  
+    }else{
+      i=i+1  
     }
     
     

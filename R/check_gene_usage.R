@@ -1,3 +1,7 @@
+#'@author Georgina Leslie
+#'Latest code update: 
+#'
+#'
 library(stringr)
 library(data.table)
 
@@ -125,6 +129,6 @@ readInGeneNamesIMGTFasta <- function(ref_gene_data){
 #'Returns a data table containing the data where the frequency is 0
 #'@param freq_table frequency table, column 1 is the gene and column 2 is the frequency count
 getAbsentGeneList<- function(freq_table){
-  deleted_genes <- freq_table[freq_table$gene_freq_count==0,]
+  deleted_genes <- freq_table[freq_table$gene_count==0,]
   return(deleted_genes)
 }
