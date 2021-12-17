@@ -50,6 +50,7 @@ library(kableExtra)
 #  Input parameters 
 
 ```{r input-parameters}
+#SECTION 1
 gene_data = NA
 save(params, file=file.path(params$outdir,"params.RData"))
 if(is.null(params$genome_file)){
@@ -75,9 +76,24 @@ red = "pink"
 repertoire <- read_airr(params$rep)
 repertoire <- as.data.table(repertoire)
 repertoire_dt <-fread(params$rep)
+
+#Set up section colours
+section_1=green
+section_2=green
+section_3=green
+section_4=green
+section_5=green
+section_6=green
+section_7=green
+section_8=green
+section_9=green
+section_10=green
+section_11=green
+
 ```
 # Quality Control Stats
 ```{r warning=TRUE,results="asis"}
+#SECTION 2
 validate_airr(repertoire)
 writeLines("<h3> Columns with missing / No data </h3> ")
 kbl(data.table(column_name = findMissingColumns(repertoire)))
@@ -87,6 +103,7 @@ print(params$full_or_basic)
 # Non-nucleotides in sequence
 
 ```{r warning=FALSE}
+#SECTION 3
 check_nucleotides(repertoire)
 ```
 
@@ -94,6 +111,7 @@ check_nucleotides(repertoire)
 Below provides useful statistics about your repertoire:
 
 ```{r warning=TRUE}
+#SECTION 4
 prod_data <-getFullRatioNonProductive(repertoire)
 values = c(prod_data[[1]],prod_data[[2]],prod_data[[3]])
 labels = c("Productive","Non-productive","NA/Not specified")
@@ -142,69 +160,117 @@ kbl(getCoreStats(sequence_length_data))
 \n
 Percentage of sequences where the V and J region are in-frame:
 ```{r , comment=NA,results="asis"}
+if("vj_in_frame" %in% colnames(repertoire)&!any(is.na(repertoire$vj_in_frame))){
 writeLines(paste(getInFramePercentage(repertoire),"%"))
-
+}else{
+   writeLines("Missing Column vj_in_frame")
+}
 ```
 
 # Gene Usage Statistics
 
-```{r warning=TRUE,results="asis"}
+```{r warning=TRUE,results="asis",fig.width=9}
+#SECTION 5
 genes_present <- getGeneData(repertoire_dt)
-kbl(genes_present)
+#kbl(genes_present) 
 ```
 
 
-```{r warning=TRUE,results="asis"}
+```{r warning=TRUE,fig.height=20,results="asis"}
 if(is.list(gene_data)){
-print(typeof(gene_data))
+
 fasta_genes <- readInGeneNamesIMGTFasta(gene_data)
 gene_freq_table = geneCount(genes_present,fasta_genes)
+freq_data_table=gene_freq_table
 gene_freq_table=gene_freq_table[gene_freq_table$gene_count>0,]
 gene_tables=getUniqueGenes(gene_freq_table)
-genes_only_freq_table = gene_tables$unique_genes_list
-kbl(gene_freq_table)
+genes_only_freq_table = gene_tables[[1]]
 
+cat("\n")
+print(kable(gene_freq_table))
+cat("\n")
 
 number_unqiue_alleles = length(gene_freq_table$gene_name)
 number_unqiue_genes = length(genes_only_freq_table$gene_name)
-labels=c("Number of unique alleles present for all genes" , "Number of unique genes present")
+labels=c("Number of unique alleles" , "Number of unique genes")
 values=c(number_unqiue_alleles,number_unqiue_genes)
-###
-kbl(gene_tables[[1]])
+
+barplot(values,names.arg = labels,col='light blue',ylab="Counts" ,main="Comparison of unique genes to unique alleles" )
+print(number_unqiue_genes)
+print(ggplot(gene_freq_table,aes(x=gene_name,y=gene_count ,fill=gene_count))+geom_bar(stat="identity")+guides(fill = "none")+labs(x="Gene",y="Number of occurences")+coord_flip())
+
+
+cat("\n")
+print(kable(gene_tables[[1]]))
+cat("\n")
 allele_link=gene_tables[[2]]
 gene_allele_freq_table=data.frame(table(allele_link$gene,allele_link$allele))
 gene_allele_freq_table = gene_allele_freq_table[gene_allele_freq_table$Freq>0,]
 gene_allele_freq_table$Var1 <- as.factor(gene_allele_freq_table$Var1)
-ggplot(gene_allele_freq_table,aes(x=Var1,y=Freq,fill=Var2))+geom_bar(stat="identity")+guides(fill = "none", x=guide_axis(angle=90))+labs(x="Gene",y="Number of alleles present")
-kbl(allele_link)
+print(ggplot(gene_allele_freq_table,aes(x=Var1,y=Freq,fill=Var2))+geom_bar(stat="identity")+guides(fill = "none", x=guide_axis(angle=90))+labs(x="Gene",y="Number of alleles present"))
+
+cat("\n")
+print(kable(allele_link))
+cat("\n")
+
+writeLines("<h3>Genes not present in the repertoire:</h3>")
+print(kable(getAbsentGeneList(freq_data_table)))
+
 }else{
    writeLines("No reference genome uploaded.")
 }
 
 ```
 
+
 # General Sumrep Statistics
 
 ```{r warning=TRUE,results="asis"}
-
+#SECTION 6
 plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
 legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
-    
+
+if("sequence_alignment" %in% colnames(repertoire)&!any(is.na(repertoire$sequence_alignment))){
+hotspotCountDist(repertoire)
+coldspotCountDist(repertoire)
 gcContentDistribution(repertoire)
-positionDistancesBetweenMutationDistribution(repertoire)
-distanceFromGermlineToSequenceDistribution(repertoire)
+}else{
+   section_6 = amber
+    writeLines("Missing column : sequence_alignment \n Unable to run statistics : getHotspotCountDistribution , getColspotCountDistribution, getGCContentDistribution")
+}
+
+
+if("sequence_alignment" %in% colnames(repertoire) & "germline_alignment" %in% colnames(repertoire) &  !any(is.na(repertoire$sequence_alignment))& !any(is.na(repertoire$germline_alignment))){
+ positionDistancesBetweenMutationDistribution(repertoire)
+ distanceFromGermlineToSequenceDistribution(repertoire)  
+}else{
+   if(section_6 == amber){
+      section_6 = red
+   }else{
+      section_6 = amber
+   }
+   writeLines("Missing columns : sequence_alignment , germline_alignment  \n Unable to run statistics : positionDistancesBetweenMutationDistribution , distanceFromGermlineToSequenceDistribution")
+}
+
 ```
 
 
 #  Pairwise Statistics
 
 ```{r warning=TRUE,results="asis"}
+#SECTION 7
 if(isTRUE(full_check)){
  plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
 legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
+
+if("sequence_alignment" %in% colnames(repertoire)&!any(is.na(repertoire$sequence_alignment))){
 CDR3pairwiseDistanceInfo(repertoire)
 pairwiseDistDistribution(repertoire)
-nearestNeighbourDistInfo
+nearestNeighbourDistInfo(repertoire)
+}else{
+   section_7 = red
+   writeLines("Missing column : Sequence_alignment \n Unable to run statistics")
+}
 }else{
    writeLines("Only the basic statistics were run.Please see other sections for the other statistics.")
 }
@@ -215,15 +281,19 @@ nearestNeighbourDistInfo
 #  Physiochemical Statistics
 
 ```{r warning=TRUE,results="asis"}
+#SECTION 8
 plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
 legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
+
+
 #polarityDistribution(repertoire)
 #aromaticityDistribution(repertoire)
 #acidityDistribution(repertoire)
 #basicityDistribution(repertoire)
 # bulkinessDistribution(repertoire)
 # chargeDistribution(repertoire)
-aliphaticDistribution(repertoire)
+aliphaticDistribution(repertoire_dt)
+print(mean(getAliphaticIndexDistribution(repertoire_dt)),nm.rm=TRUE)
 GRAVYDistribution(repertoire)
 
 ```
@@ -232,54 +302,77 @@ GRAVYDistribution(repertoire)
 #  Insertion Length Distributions
 
 ```{r warning=TRUE,results="asis"}
+#SECTION 9
 plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
 legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
-
-VDinsertionLengthDistribution(repertoire)
+if("np1_length" %in% colnames(repertoire)&!any(is.na(repertoire$np1_length))){
+ VJinsertionLengthDistribution(repertoire)
+ VDinsertionLengthDistribution(repertoire)
+}else{
+ writeLines("Missing Column : np1_length")  
+}
+if("np2_length" %in% colnames(repertoire)&!any(is.na(repertoire$np2_length))){
 DJinsertionLengthDistribution(repertoire)
-VJinsertionLengthDistribution(repertoire)
+}else{
+   writeLines("Missing Column : np2_length")  
+}
 ```
 
 #  Prime deletion Distributions Statistics
 
 ```{r warning=TRUE,results="asis"}
+#SECTION 10
+
 plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
 legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
 
+missing_col_count = 0
 ##
 if("v_3p_del" %in% colnames(repertoire)&!any(is.na(repertoire$v_3p_del))){
  VGene3PrimeDeletionLengthDistribution(repertoire)  
+missing_col_count = missing_col_count +1
 }else{
-   writeLines("Missing column : v_3p_del , Cannot run statistic \n")
+   writeLines("\n Missing column : v_3p_del , Cannot run statistic \n")
 }
 if("v_5p_del" %in% colnames(repertoire)&!any(is.na(repertoire$v_5p_del))){
  VGene5PrimeDeletionLengthDistribution(repertoire) 
+   missing_col_count = missing_col_count +1
 }else{
    writeLines("Missing column : v_5p_del , Cannot run statistic \n")
 }
 ##
 if("d_3p_del" %in% colnames(repertoire)&!any(is.na(repertoire$d_3p_del))){
 DGene3PrimeDeletionLengthDistribution(repertoire)
+   missing_col_count = missing_col_count +1
 }else{
    writeLines("Missing column : d_3p_del , Cannot run statistic \n")
 }
 if("d_5p_del" %in% colnames(repertoire)&!any(is.na(repertoire$d_5p_del))){
 DGene5PrimeDeletionLengthDistribution(repertoire)
+   missing_col_count = missing_col_count +1
 }else{
    writeLines("Missing column : d_5p_del , Cannot run statistic \n")
 }
 ##
 if("j_3p_del" %in% colnames(repertoire)&!any(is.na(repertoire$j_3p_del))){
 JGene3PrimeDeletionLengthDistribution(repertoire)
+   missing_col_count = missing_col_count +1
 }else{
    writeLines("Missing column : j_3p_del , Cannot run statistic \n")
 }
 if("j_5p_del" %in% colnames(repertoire)&!any(is.na(repertoire$j_5p_del))){
 JGene5PrimeDeletionLengthDistribution(repertoire)
+   missing_col_count = missing_col_count +1
 }else{
    writeLines("Missing column : j_5p_del , Cannot run statistic \n")
 }
 
+if(missing_col_count > 3){
+   section_10=red
+}
+if(missing_col_count > 0){
+   section_10=amber
+}
 ```
 
 
@@ -287,22 +380,26 @@ JGene5PrimeDeletionLengthDistribution(repertoire)
 #  Possible Chimerisms
 Below table shows the comparison between the total number of sequences compares to the total number of unique CDR3 sequences and then compared to the number of CDR3 sequences that have multiple different v-call genes associated with them.
 ```{r CDR3_Chimera_Check, warning = TRUE ,fig.width=9}
+#SECTION 11
+if(full_check == TRUE){
+repertoire_dt = repertoire_dt[!is.na(repertoire_dt$sequence),]
 cdr3_seq_info = checkCDR3(repertoire_dt)
 
 #table(cdr3_seq_info$cdr3_seq)
-cdr3_vcalls = getVCalls(cdr3_seq_info,repertoire,FALSE)
+cdr3_vcalls = getVCalls(cdr3_seq_info,repertoire_dt,FALSE)
 total_num_unique_seq = length(unique(repertoire_dt$sequence))
 ##
 num_uniq_cdr3_seq = length(unique(cdr3_seq_info$cdr3_seqs))
 
 num_occur_multiple_gene_call <- length(which(data.frame(table(cdr3_seq_info$cdr3_seqs))$Freq > 1))
-kbl(cdr3_vcalls)
+#kbl(cdr3_vcalls)
 
 ####
 # 
  freq_table= data.frame(table(as.character(cdr3_vcalls$seq),as.character(cdr3_vcalls$v_call_genes)))
  freq_table= freq_table[freq_table$Freq >1,]
-
+multiple_vgene_freq = data.frame(table(as.character(freq_table$Var1)))
+multiple_vgene_freq = multiple_vgene_freq[multiple_vgene_freq$Freq>1,]
 multiple_gene_calls = length(table(freq_table$Var1))
 #print(freq_table)
 seqs_stats_vals=c(total_num_unique_seq,num_uniq_cdr3_seq,multiple_gene_calls)
@@ -315,7 +412,10 @@ barplot(seqs_stats_vals,names.arg = labels,col='dark blue',xlab="Occurences" ,ma
 
 freq_table$Var2 <- as.factor(freq_table$Var2)
 ggplot(freq_table,aes(x=Var2,y=Freq,fill=Var1))+geom_bar(stat="identity")+guides(fill = "none", x=guide_axis(angle=90))+labs(x="Gene",y="Number of sequences present")
-
+}else{
+   writeLines("Only Basic stats were run , if you would like to get stats of possible chimeric sequences please run full stats.")
+   section_11 = "DarkGrey"
+}
 ```
 
 
@@ -332,17 +432,15 @@ if(length(repertoire_dt$sequence)>100000){
 
 # if(seq_type == "")
 # display_type
-
-plotVgeneDist(cdr3_vcalls,num_to_display, "aa",freq_table)
+if (full_check == TRUE){
+plotVgeneDist(cdr3_vcalls,num_to_display, "aa",multiple_vgene_freq)}
 #kbl(most_chimeric)
 ```
 
-# Find areas of amplification
-
 ```{r warning = TRUE, results="asis"}
 #kbl(as.data.table(findAmplificationAreas(repertoire)))
-print(getwd())
-addTrafficLighting(c("pink","NavajoWhite","LightGreen"))
+
+addTrafficLighting(c(section_1,section_2,section_3,section_4,section_5,section_6,section_7,section_8,section_9,section_10,section_11))
 ```
 
 

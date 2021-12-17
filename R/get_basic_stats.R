@@ -1,5 +1,5 @@
+#'@author Georgina Leslie
 library(data.table)
-
 library(seqinr)
 library(stringr)
 library(Biostrings)
@@ -34,8 +34,12 @@ getSequenceLengths <- function(data){
     i=i+1
   }
     return(sequence_lengths)
-  }
+}
 
+#' A function that displays the coverage of a sequence to its gene
+#' PLEASE NOTE. This function is NOT implemented into the  
+#' @param file_data the repertoire file data 
+#' @param gene_list the list of genes 
 getSequenceCoverage <- function(file_data , gene_list){
   row = 1
  gene_list_names = names(gene_list)
@@ -60,13 +64,9 @@ getSequenceCoverage <- function(file_data , gene_list){
         gene_name=matches[[1]][2,2]
         if(gene_name == gene){
           print("---------")
-          #print(gene)
           print(name)
           row_count=row
           print(gene_list[[name]][1])
-          #print(data[row_count,1])
-          #print(file_data[row_count,9])
-          #print(gene)
           if(file_data[row_count,3]=="T"){
             seq = toString((file_data[row_count,1]))
             print(reverseComplement(DNAString(seq)))
@@ -95,7 +95,7 @@ alignSequenceToKnownGeneSeq <- function(data_seq,gene_seq){
   return(plotSequenceAlignments(local,data_seq,gene_seq))
 }
 
-#alignment_object=loc
+
 plotSequenceAlignments<-function(alignment_object,data_seq,gene_seq){
   
   data_align_start=as.integer(alignment_object@subject@range@start)

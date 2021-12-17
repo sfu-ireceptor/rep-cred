@@ -82,7 +82,7 @@ getCoreStats <- function(data){
     standard_dev <- sd(data)
     perc5_quant <- quantile(data,probs=c(0.05,0.95))[1]
     perc95_quant <- quantile(data,probs=c(0.05,0.95))[2]
-    vals <-data.table(min=as.double(min),max=as.double(max),mean=as.double(mean),median= as.double(median), percentile_5 = as.double(perc5_quant),percentile_95=as.double(perc95_quant), standard_dev = as.double(standard_dev)) 
+    vals <-data.table(min=as.double(min),max=as.double(max),mean=(mean),median= as.double(median), percentile_5 = as.double(perc5_quant),percentile_95=as.double(perc95_quant), standard_dev = as.double(standard_dev)) 
     return(vals)
 }
 
