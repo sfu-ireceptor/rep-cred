@@ -8,3 +8,4 @@ man/
 **/vignettes/*.pdf
 **/vignettes/*.html
 .directory
+.idea
