@@ -36,7 +36,7 @@
 #'
 #'
 #'
-#'
+#' @export
 replaceChapterClassType<-function(file_path){
   all_html_files <- list.files(gsub(" ", "", paste(getwd(),"/results/")),".html")
   for(single_file in all_html_files ){
