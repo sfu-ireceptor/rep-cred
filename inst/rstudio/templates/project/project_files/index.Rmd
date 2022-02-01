@@ -2,6 +2,7 @@
 title: "Credibility of a repertoire report"
 author: ""
 date: "Updated: `r date()`"
+knit: "bookdown::render_book"
 site: bookdown::bookdown_site
 documentclass: book
 bibliography: "references.bib"
@@ -26,7 +27,7 @@ params:
    cache: FALSE
    rep:  !r system.file("extdata", "ExampleDb.tsv", package = "repcred")
    outdir: !r tempdir()
-   genome_file: !r FALSE
+   genome_file: !r NULL
    full_or_basic: !r FALSE
 ---
 
@@ -280,7 +281,14 @@ nearestNeighbourDistInfo(repertoire)
 
 #  Physiochemical Statistics
 
-```{r warning=TRUE,results="asis"}
+```{r}
+if (all(is.na(repertoire_dt$junction_aa))) {
+    print("Skipping this section: `juncation_aa` is empty.")
+}
+```
+
+
+```{r warning=TRUE,results="asis",eval=!all(is.na(repertoire_dt$junction_aa))}
 #SECTION 8
 plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
 legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
