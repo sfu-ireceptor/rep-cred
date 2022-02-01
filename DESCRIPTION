@@ -1,7 +1,7 @@
 Package: repcred
 Type: Package
 Version: 0.0.0
-Date: 2020-03-02
+Date: 2022-02-01
 Authors@R: c(person("Susanna", "Marquez", role=c("aut", "cre"), 
                     email="susanna.marquez@yale.edu"),
                      person("AIRR Community", role=c("cph")))
@@ -13,18 +13,27 @@ LazyData: true
 BuildVignettes: true
 VignetteBuilder: knitr
 Encoding: UTF-8
+biocViews:
 Depends:
     R (>= 3.1.2),
     shiny
 Imports:
     airr,
+    ape,
+    Biostrings,
     bookdown,
+    data.table,
     dplyr,
+    ggplot2,
+    kableExtra,
     knitr,
     plotly,
+    reticulate,
     rmarkdown,
+    seqinr,
+    spgs,
     stringr,
     sumrep
 Suggests:
     testthat
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
