@@ -55,13 +55,29 @@ server <- function(input, output) {
       )
 
       if (!is.null(dataValues$repcred_report_path)) {
-         repcred::replaceChapterClassType(dataValues$repcred_report_path)
+          
+         #repcred::replaceChapterClassType(dataValues$repcred_report_path)
          shiny::addResourcePath(basename(dirname(dataValues$repcred_report_path)),dirname(dataValues$repcred_report_path))
-         actionButton(inputId='openResultsBtn',
-                      label= 'Open analysis results',
-                      icon = icon("link"),
-                      style="color: #fff; background-color: #f39c12; border-color: #f39c12",
-                      onclick =paste0("window.open('",file.path(".",basename(dirname(dataValues$repcred_report_path)),basename(dataValues$repcred_report_path)),"', '_blank')")
+          
+          output$downloadResults <- downloadHandler(
+              filename = function() {
+                  "report.zip"
+              },
+              content = function(fname) {
+                  zip(zipfile=fname, files=dirname(dataValues$repcred_report_path))
+                  if(file.exists(paste0(fname, ".zip"))) {file.rename(paste0(fname, ".zip"), fname)}
+              },
+              contentType = "application/zip"
+          )
+          
+         div(
+             actionButton(inputId='openResultsBtn',
+                          label= 'Open analysis results',
+                          icon = icon("link"),
+                          style="color: #fff; background-color: #f39c12; border-color: #f39c12",
+                          onclick =paste0("window.open('",file.path(".",basename(dirname(dataValues$repcred_report_path)),basename(dataValues$repcred_report_path)),"', '_blank')")
+             ),
+             downloadButton("downloadResults")
          )
       }
    })
