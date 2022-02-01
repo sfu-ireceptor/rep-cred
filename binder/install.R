@@ -11,6 +11,6 @@ install.packages(c("alakazam", "ape", "data.table", "dplyr", "entropy", "HDMD", 
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install("Biostrings")
-devtools::install_github("matsengrp/sumrep", ref="master", dependencies=TRUE)
 devtools::install_github("LuciaRotger/CollessLike")
+devtools::install_github("matsengrp/sumrep", ref="master", dependencies=TRUE)
 devtools::install_github("airr-community/rep-cred", ref="master", dependencies=TRUE)
