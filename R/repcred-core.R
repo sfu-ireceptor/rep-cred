@@ -106,13 +106,13 @@ render_report <- function(rep, outdir,genome,sumrep) {
     # render
     xfun::in_dir(
         outdir,
-    book <- bookdown::render_book(
-        input = ".",
-        output_format='bookdown::gitbook',
-        config_file ="_bookdown.yml",
-        clean=FALSE,
-        new_session=FALSE, clean_envir=FALSE,
-        params=list("rep"=rep, outdir=outdir,"genome_file"=genome,full_or_basic=sumrep))
+        book <- bookdown::render_book(
+            input = ".",
+            output_format='bookdown::gitbook',
+            config_file ="_bookdown.yml",
+            clean=FALSE,
+            new_session=FALSE, clean_envir=FALSE,
+            params=list("rep"=rep, outdir=outdir,"genome_file"=genome,full_or_basic=sumrep))
     )
     book
 }
