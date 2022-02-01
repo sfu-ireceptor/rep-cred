@@ -80,7 +80,7 @@ fullCheckNonProductiveSeqs <- function(file){
    return(list(non_productive_ambig,non_productive_with_stop,non_productive_norm,total_num))
 }
 
-
+#' @export
 getFullRatioNonProductive <- function(file){
   productive =0
   non_productive=0

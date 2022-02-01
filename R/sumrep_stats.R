@@ -37,6 +37,7 @@ plotStats<-function(data,stats , main_text , xlab_text){
 #' Creates a plot and statistics from the output data of the sumrep function :
 #' getCDR3PairwiseDistanceDistribution()
 #' @param data repertoire data file in data.table format
+#' @export
 CDR3pairwiseDistanceInfo <- function(data){
     cdr3_pairwise_distance = getCDR3PairwiseDistanceDistribution(data)
     stats <- getCoreStats(cdr3_pairwise_distance)
@@ -47,6 +48,7 @@ CDR3pairwiseDistanceInfo <- function(data){
 #' Creates a plot and statistics from the output data of the sumrep function :
 #' getNearestNeighborDistribution()
 #' @param data repertoire data file in data.table format
+#' @export
 nearestNeighbourDistInfo <- function(data){
   nn_distribution = getNearestNeighborDistribution(data)
   stats <- getCoreStats(nn_distribution)
@@ -58,6 +60,7 @@ nearestNeighbourDistInfo <- function(data){
 #' Creates a plot and statistics from the output data of the sumrep function :
 #' getPairwiseDistanceDistribution()
 #' @param data repertoire data file in data.table format
+#' @export
 pairwiseDistDistribution <- function(data){
   pairwise_distribution = getPairwiseDistanceDistribution(data,column = "sequence")
   stats <- getCoreStats(pairwise_distribution)
@@ -70,6 +73,7 @@ pairwiseDistDistribution <- function(data){
 #' If there are any NA values in the sequence alignment column it instead runs the 
 #' statistic on the sequence column
 #' @param data repertoire data file in data.table format
+#' @export
 gcContentDistribution<- function(data){
   if(anyNA(data$sequence_alignment)){
     gc_distribution = getGCContentDistribution(data, column="sequence") 
@@ -86,7 +90,7 @@ gcContentDistribution<- function(data){
 #' Creates a plot and statistics from the output data of the sumrep function :
 #' getAliphaticIndexDistribution()
 #' @param data repertoire data file in data.table format
-
+#' @export
 aliphaticDistribution<- function(data){
   aliph_distribution = getAliphaticIndexDistribution(data)
   stats <- getCoreStats(aliph_distribution)
@@ -97,6 +101,7 @@ aliphaticDistribution<- function(data){
 #' Creates a plot and statistics from the output data of the sumrep function :
 #' getGRAVYDistribution()
 #' @param data repertoire data file in data.table format
+#' @export
 GRAVYDistribution<- function(data){
   gravy_distribution = getGRAVYDistribution(data)
   stats <- getCoreStats(gravy_distribution)
@@ -107,7 +112,7 @@ GRAVYDistribution<- function(data){
 #' Creates a plot and statistics from the output data of the sumrep function :
 #' getPositionalDistanceBetweenMutationsDistribution()
 #' @param data repertoire data file in data.table format
-
+#' @export
 positionDistancesBetweenMutationDistribution <- function(data){
   pos_distribution<-getPositionalDistanceBetweenMutationsDistribution(data)
   stats <- getCoreStats(pos_distribution)
@@ -117,7 +122,7 @@ positionDistancesBetweenMutationDistribution <- function(data){
 #' Creates a plot and statistics from the output data of the sumrep function :
 #' getDistanceFromGermlineToSequenceDistribution()
 #' @param data repertoire data file in data.table format
-
+#' @export
 distanceFromGermlineToSequenceDistribution <- function(data){
   lev_distribution_germline_to_seq<-getDistanceFromGermlineToSequenceDistribution(data)
   stats <- getCoreStats(lev_distribution_germline_to_seq)
@@ -147,7 +152,7 @@ perGenePerPositionMutationRates <- function(data){
 #' Creates a plot and statistics from the output data of the sumrep function :
 #' getHotspotCountDistribution()
 #' @param data repertoire data file in data.table format
-
+#' @export
 hotspotCountDist <- function(data){
   hotspot <- getHotspotCountDistribution(data)
   stats <- getCoreStats(hotspot)
@@ -157,7 +162,7 @@ hotspotCountDist <- function(data){
 #' Creates a plot and statistics from the output data of the sumrep function :
 #' getColdspotCountDistribution()
 #' @param data repertoire data file in data.table format
-
+#' @export
 coldspotCountDist <- function(data){
   coldspot <- getColdspotCountDistribution(data)
   stats <- getCoreStats(coldspot)
@@ -227,7 +232,7 @@ bulkinessDistribution <- function(data){
 #' Creates a plot and statistics from the output data of the sumrep function :
 #' getVDInsertionLengthDistribution()
 #' @param data repertoire data file in data.table format
-
+#' @export
 VDinsertionLengthDistribution<- function(data){
   VDinst= getVDInsertionLengthDistribution(data)
   stats <- getCoreStats(VDinst)
@@ -237,7 +242,7 @@ VDinsertionLengthDistribution<- function(data){
 #' Creates a plot and statistics from the output data of the sumrep function :
 #' getDJInsertionLengthDistribution()
 #' @param data repertoire data file in data.table format
-
+#' @export
 DJinsertionLengthDistribution<- function(data){
   DJinst= getDJInsertionLengthDistribution(data)
   stats <- getCoreStats(DJinst)
@@ -247,7 +252,7 @@ DJinsertionLengthDistribution<- function(data){
 #' Creates a plot and statistics from the output data of the sumrep function :
 #' getVJInsertionLengthDistribution()
 #' @param data repertoire data file in data.table format
-
+#' @export
 VJinsertionLengthDistribution<- function(data){
   VJinst= getVJInsertionLengthDistribution(data)
   stats <- getCoreStats(VJinst)

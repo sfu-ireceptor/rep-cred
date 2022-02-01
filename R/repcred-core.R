@@ -73,6 +73,8 @@ getNormalSeqNumColor <- function(total_num,normal_num){
     return(color)
 }
 
+
+#' @export
 getCoreStats <- function(data){
     data = na.omit(data)
     min <- range(data)[1]

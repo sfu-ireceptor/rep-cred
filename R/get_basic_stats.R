@@ -9,6 +9,7 @@ library(ggplot2)
 #'getNumAmbiguousSeqs returns a list of two values. First the number of sequences 
 #'containing ambiguous calls, second the number of normal sequences
 #'@param data repertoire file in data table format
+#' @export
 getNumAmbiguousSeqs <- function(data){
 ambiguous_calls = 0
 normal_seqs = 0
@@ -26,6 +27,7 @@ for (seq in data$sequence) {
 #'getSeqLengths returns the number of characters in each nucleotide sequence in the 
 #'repertoire
 #'@param data repertoire file in data table format
+#'@export
 getSequenceLengths <- function(data){
   sequence_lengths <- vector(length=length(data$sequence))
   i=0
@@ -127,6 +129,7 @@ plotSequenceAlignments<-function(alignment_object,data_seq,gene_seq){
 #' findMissingColumns returns a vector containing the names of columns that contain any
 #' NA values.
 #'@param data repertoire file in data table format
+#'@export
 findMissingColumns<- function(data){
   missing_columns = names(which(sapply(data,anyNA)))
   return(missing_columns)

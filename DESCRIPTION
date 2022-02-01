@@ -19,6 +19,7 @@ Depends:
     shiny
 Imports:
     airr,
+    alakazam,
     ape,
     Biostrings,
     bookdown,
