@@ -101,10 +101,11 @@ render_report <- function(rep, outdir,genome,sumrep) {
     # Create project in outdir
     invisible(repcred_project(outdir))
     
-    setwd("../rstudio/templates/project/project_files/")
-    
+    #setwd("../rstudio/templates/project/project_files/")
     
     # render
+    xfun::in_dir(
+        outdir,
     book <- bookdown::render_book(
         input = ".",
         output_format='bookdown::gitbook',
@@ -112,7 +113,7 @@ render_report <- function(rep, outdir,genome,sumrep) {
         clean=FALSE,
         new_session=FALSE, clean_envir=FALSE,
         params=list("rep"=rep, outdir=outdir,"genome_file"=genome,full_or_basic=sumrep))
-
+    )
     book
 }
 
