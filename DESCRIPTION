@@ -13,7 +13,7 @@ LazyData: true
 BuildVignettes: true
 VignetteBuilder: knitr
 Encoding: UTF-8
-biocViews:
+biocViews: DataRepresentation
 Depends:
     R (>= 3.1.2),
     shiny
@@ -21,20 +21,29 @@ Imports:
     airr,
     alakazam,
     ape,
+    BiocGenerics,
     Biostrings,
     bookdown,
     data.table,
+    CollessLike,
     dplyr,
+    GenomeInfoDb,
     ggplot2,
+    IRanges,
     kableExtra,
     knitr,
     plotly,
     reticulate,
     rmarkdown,
+    S4Vectors,
     seqinr,
     spgs,
     stringr,
-    sumrep
+    sumrep,
+    XVector
 Suggests:
     testthat
+Remotes: 
+    github::LuciaRotger/CollessLike,
+    github::matsengrp/sumrep
 RoxygenNote: 7.1.2

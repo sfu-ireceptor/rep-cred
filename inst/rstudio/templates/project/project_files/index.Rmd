@@ -74,7 +74,7 @@ red = "pink"
 
 
 ```{r warning=FALSE}
-repertoire <- read_airr(params$rep)
+repertoire <- read_rearrangement(params$rep)
 repertoire <- as.data.table(repertoire)
 repertoire_dt <-fread(params$rep)
 
