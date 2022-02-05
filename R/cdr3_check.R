@@ -10,6 +10,7 @@ library(ape)
 #' the CDR3 start and end values and split the sequence to get the CDR3 seq.
 #'@param data Repertoire file in data.table format
 #'@return A data.table containing the CDR3 sequence and the row it was taken from in the original repertoire file.
+#' @export
 checkCDR3<- function(data){
   
   row_count=0
@@ -68,8 +69,7 @@ checkCDR3<- function(data){
 #'@param cdr3_seq_info data.frame that is returned by the function 'checkCDR3',
 #'@param original_data The original data.table variable that contains the whole repetoire file data
 #'@param include_ambiguous_calls Boolean value of whether to include ambiguous v_calls in the analysis i.e. "IGHV-30D*1, or 
-
-
+#' @export
 getVCalls<- function(cdr3_seqs_info,original_data,include_ambiguous_calls){
   joint=vector()
   sequence_id=which(colnames(original_data)=="sequence_id")
@@ -124,7 +124,7 @@ getVCalls<- function(cdr3_seqs_info,original_data,include_ambiguous_calls){
 #'@param num_of_results_to_show the number of results to  plot and display
 #'@param aa_or_nn value to determine if the sequences should be displayed as amino acid sequence or nucleotide sequence
 #'@param freq_table table containing the number of different v-calls for a given sequence.Used to rule out any sequences that only have one V-call associated with it. 
-
+#' @param
 plotVgeneDist <- function(cdr3_data_table,num_of_results_to_show,aa_or_nn,freq_table){
   seq = vector()
   count = vector()

@@ -2,6 +2,7 @@ library(data.table)
 
 stop_codons = c("TAG","TAA","TGA")
 
+#' @export
 checkForReverseComplement <- function(file,seq_data){
   seqs_data<- as.data.table(seq_data)
   row_count = 0
