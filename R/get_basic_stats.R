@@ -1,10 +1,10 @@
 #'@author Georgina Leslie
-library(data.table)
-library(seqinr)
-library(stringr)
-library(Biostrings)
-library(spgs)
-library(ggplot2)
+# library(data.table)
+# library(seqinr)
+# library(stringr)
+# library(Biostrings)
+# library(spgs)
+# library(ggplot2)
 
 #'getNumAmbiguousSeqs returns a list of two values. First the number of sequences 
 #'containing ambiguous calls, second the number of normal sequences

@@ -2,8 +2,8 @@
 #'Latest code update: 
 #'
 #'
-library(stringr)
-library(data.table)
+# library(stringr)
+# library(data.table)
 
 #''getGeneUsageFrequency' counts the proportional frequency of each gene. 
 #'If there are multiple v-calls for a single sequence their value is equal to

@@ -1,4 +1,4 @@
-library(data.table)
+# library(data.table)
 
 stop_codons = c("TAG","TAA","TGA")
 
