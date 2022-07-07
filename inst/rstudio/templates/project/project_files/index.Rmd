@@ -37,6 +37,11 @@ knitr::opts_chunk$set(fig.width=7, fig.asp=0.7,
                       warning=FALSE, message=FALSE,
                       out_dir=params$outdir,
                       eval.opts = c('eval', 'echo', 'fig.height', 'fig.width'))
+
+# Save params to an .RData file. Useful for debugging.
+save(params, file=file.path(params$outdir,"params.RData"))
+
+# Load libraries
 library(repcred)
 library(airr)
 library(sumrep)
@@ -46,14 +51,21 @@ library(ggplot2)
 library(data.table)
 library(seqinr)
 library(kableExtra)
+
+# Configuration and default values
+gene_data = NA
+
+#Below variables are set to give the orange , green and red colours. These colours were used as it makes the text easier to read and are more muted than the regular red , orange and green.
+green = "LightGreen"
+amber = "NavajoWhite"
+red = "pink"
+params
 ```
 
 #  Input parameters 
 
 ```{r input-parameters}
 #SECTION 1
-gene_data = NA
-save(params, file=file.path(params$outdir,"params.RData"))
 if(is.null(params$genome_file)){
   gene_data = FALSE
 }else{
@@ -65,11 +77,7 @@ if(params$full_or_basic == "Full sumrep stats"){
 }else{
    full_check = FALSE
 }
-
-#Below variables are set to give the orange , green and red colours. These colours were used as it makes the text easier to read and are more muted than the regular red , orange and green.
-green = "LightGreen"
-amber = "NavajoWhite"
-red = "pink"
+params
 ```
 
 
@@ -93,13 +101,22 @@ section_11=green
 
 ```
 # Quality Control Stats
+
 ```{r warning=TRUE,results="asis"}
 #SECTION 2
-validate_airr(repertoire)
-writeLines("<h3> Columns with missing / No data </h3> ")
-kbl(data.table(column_name = findMissingColumns(repertoire)))
+is_compliant <- validate_airr(repertoire)
+missing_columns <- findMissingColumns(repertoire)
+if (length(missing_columns) > 0) {
+    writeLines("<h3> Columns with missing / No data </h3> ")
+    kbl(data.table(column_name = missing_columns))
+}
 print(params$full_or_basic)
+if (!is_compliant) {
+ formattedErrorMeassage("The repertoire is not AIRR compliant. Exiting analysis.")
+ knitr::knit_exit()   
+}
 ```
+
 
 # Non-nucleotides in sequence
 

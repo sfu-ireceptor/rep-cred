@@ -59,3 +59,13 @@ replaceChapterClassType<-function(file_path){
    return(file_data)
 }
 
+#'
+#'
+#'
+#' @export
+formattedErrorMeassage <- function(x) {
+    txt <- paste('\n\n<div class="alert alert-danger">',
+      gsub('##', '\n', gsub('^##\ Error', '**Error**', x)),
+      '</div>', sep = '\n')
+    writeLines(txt)
+}
