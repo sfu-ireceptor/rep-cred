@@ -29,6 +29,7 @@ params:
    outdir: !r tempdir()
    genome_file: !r NULL
    full_or_basic: !r FALSE
+   downsample: !r TRUE
 ---
 
 ```{r global-options, include=FALSE, cache=FALSE}
@@ -82,9 +83,13 @@ params
 
 
 ```{r warning=FALSE}
-repertoire <- read_rearrangement(params$rep)
-repertoire <- as.data.table(repertoire)
-repertoire_dt <-fread(params$rep)
+repertoire <-fread(params$rep)
+# Downsampling unless check box unticked 
+num_keep <- 5000
+if (params$downsample & nrow(repertoire) > num_keep) {
+    repertoire <- repertoire[sample(nrow(repertoire), size=num_keep), ]
+}
+
 
 #Set up section colours
 section_1=green
@@ -141,7 +146,7 @@ kbl(prod_info)
 
 ```{r warning=TRUE}
 if(getFullRatioNonProductive(repertoire)$non_prod != 0){
- ambig_non_prod_data <- fullCheckNonProductiveSeqs(repertoire_dt)
+ ambig_non_prod_data <- fullCheckNonProductiveSeqs(repertoire)
 print(ambig_non_prod_data)
 kbl(ambig_non_prod_data)
  total_num=prod_data[[2]]
@@ -166,7 +171,7 @@ knitr::kable(as.data.table(ambig_non_prod_data),col.names = labels)
 
 sequence_length_data <- getSequenceLengths(repertoire)
 hist(sequence_length_data,main="Histogram of sequence lengths" , xlab = "Sequence Length")
-num_seqs_with_noncoding_vals <- getNumAmbiguousSeqs(repertoire_dt)
+num_seqs_with_noncoding_vals <- getNumAmbiguousSeqs(repertoire)
 kbl(getCoreStats(sequence_length_data))
 
 
@@ -189,7 +194,7 @@ writeLines(paste(getInFramePercentage(repertoire),"%"))
 
 ```{r warning=TRUE,results="asis",fig.width=9}
 #SECTION 5
-genes_present <- getGeneData(repertoire_dt)
+genes_present <- getGeneData(repertoire)
 #kbl(genes_present) 
 ```
 
@@ -299,13 +304,13 @@ nearestNeighbourDistInfo(repertoire)
 #  Physiochemical Statistics
 
 ```{r}
-if (all(is.na(repertoire_dt$junction_aa))) {
+if (all(is.na(repertoire$junction_aa))) {
     print("Skipping this section: `juncation_aa` is empty.")
 }
 ```
 
 
-```{r warning=TRUE,results="asis",eval=!all(is.na(repertoire_dt$junction_aa))}
+```{r warning=TRUE,results="asis",eval=!all(is.na(repertoire$junction_aa))}
 #SECTION 8
 plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
 legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
@@ -317,8 +322,8 @@ legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and M
 #basicityDistribution(repertoire)
 # bulkinessDistribution(repertoire)
 # chargeDistribution(repertoire)
-aliphaticDistribution(repertoire_dt)
-print(mean(getAliphaticIndexDistribution(repertoire_dt)),nm.rm=TRUE)
+aliphaticDistribution(repertoire)
+print(mean(getAliphaticIndexDistribution(repertoire)),nm.rm=TRUE)
 GRAVYDistribution(repertoire)
 
 ```
@@ -407,12 +412,12 @@ Below table shows the comparison between the total number of sequences compares 
 ```{r CDR3_Chimera_Check, warning = TRUE ,fig.width=9}
 #SECTION 11
 if(full_check == TRUE){
-repertoire_dt = repertoire_dt[!is.na(repertoire_dt$sequence),]
-cdr3_seq_info = checkCDR3(repertoire_dt)
+repertoire = repertoire[!is.na(repertoire$sequence),]
+cdr3_seq_info = checkCDR3(repertoire)
 
 #table(cdr3_seq_info$cdr3_seq)
-cdr3_vcalls = getVCalls(cdr3_seq_info,repertoire_dt,FALSE)
-total_num_unique_seq = length(unique(repertoire_dt$sequence))
+cdr3_vcalls = getVCalls(cdr3_seq_info,repertoire,FALSE)
+total_num_unique_seq = length(unique(repertoire$sequence))
 ##
 num_uniq_cdr3_seq = length(unique(cdr3_seq_info$cdr3_seqs))
 
@@ -449,7 +454,7 @@ Below contain CDR3 sequences with more than one v_call:
 ```{r warning = TRUE, results="asis" } 
 options(width = 2000)
 num_to_display=0
-if(length(repertoire_dt$sequence)>100000){
+if(length(repertoire$sequence)>100000){
    num_to_display = 3
 }else{
    num_to_display = 6
