@@ -16,6 +16,7 @@ repcredWeb <- function(appDir=system.file("shiny-app",
 #' and runs a set of sets to evaluate the credibility of the repertoire.
 #' 
 #' @param  rep Path to the repertoire file.
+#' @param downsample Whether report will downsample repertoire
 #' @return Path to the credibility report. 
 #' 
 #' @examples
@@ -23,7 +24,7 @@ repcredWeb <- function(appDir=system.file("shiny-app",
 #' rep_file <- system.file(package="repcred", "extdata", "ExampleDb.tsv")
 #' repcred_report(rep_file, tempdir())
 #' @export
-repcred_report <- function(rep, outdir=NULL,genome_file,sumrep) {
+repcred_report <- function(rep, outdir=NULL,genome_file,sumrep, downsample=TRUE) {
     
     if (file.exists(rep)) {
         if (is.null(outdir)) {
@@ -35,7 +36,7 @@ repcred_report <- function(rep, outdir=NULL,genome_file,sumrep) {
     
     tryCatch(
         {
-            report_path <- render_report(rep, outdir,genome_file,sumrep)
+            report_path <- render_report(rep, outdir,genome_file,sumrep,downsample)
         },
         error = function(e) {
             stop(safeError(e))
@@ -92,7 +93,8 @@ getCoreStats <- function(data){
 #' 
 #' @param rep Path to repertoire 
 #' @param outdir Directory where the report will be generated
-render_report <- function(rep, outdir,genome,sumrep) {
+#' @param downsample Whether report will downsample repertoire
+render_report <- function(rep,outdir,genome,sumrep,downsample) {
     path = "../rstudio/templates/project/project_files/"
     if (!dir.exists(outdir)) {
         dir.create(outdir, recursive = T)
@@ -114,7 +116,8 @@ render_report <- function(rep, outdir,genome,sumrep) {
             config_file ="_bookdown.yml",
             clean=FALSE,
             new_session=FALSE, clean_envir=FALSE,
-            params=list("rep"=rep, outdir=outdir,"genome_file"=genome,full_or_basic=sumrep))
+            params=list("rep"=rep, outdir=outdir,"genome_file"=genome,full_or_basic=sumrep,
+                        "downsample"=downsample))
     )
     book
 }

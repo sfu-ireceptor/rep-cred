@@ -19,8 +19,9 @@ ui <- fluidPage(
                        multiple = FALSE,
                        accept = c("text/tab-separated-values",
                                   ".tsv", "text/plain")),
+            #Downsampled input
+            checkboxInput("input_downsample", "Downsampled repertoire?", value = TRUE ), 
             #Genome fasta file upload
-            
             checkboxInput("input_chk", "Upload germline reference set?", value = FALSE ),
             uiOutput("condInput"),
             
