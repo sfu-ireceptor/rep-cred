@@ -14,8 +14,10 @@ VignetteBuilder: knitr
 Encoding: UTF-8
 biocViews: DataRepresentation
 Depends:
-    R (>= 3.5.0),
-    shiny
+    R (>= 4.0.0),
+    shiny,
+    bookdown,
+    sumrep
 Imports:
     airr,
     alakazam,
@@ -25,17 +27,14 @@ Imports:
     ggplot2,
     knitr,
     rmarkdown,
-    sumrep,
     stringr,
-    bookdown,
     stringi,
     tidyr,
     xfun
 Suggests:
     testthat
 Remotes: 
-    github::LuciaRotger/CollessLike,
-    github::matsengrp/sumrep
+    matsengrp/sumrep
 RoxygenNote: 7.2.1
 Collate:
     'repcred.R'
