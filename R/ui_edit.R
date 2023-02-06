@@ -1,5 +1,7 @@
-#' @export
- addTrafficLighting <- function(vector_of_colours){
+#' @include repcred.R
+NULL
+
+addTrafficLighting <- function(vector_of_colours){
    css_file = file("results/repcred.css")
    
    div_main_css = "#div-main {
@@ -37,7 +39,6 @@
 #'
 #'
 #'
-#' @export
 replaceChapterClassType<-function(file_path){
   all_html_files <- list.files(gsub(" ", "", paste(getwd(),"/results/")),".html")
   for(single_file in all_html_files ){
@@ -62,7 +63,6 @@ replaceChapterClassType<-function(file_path){
 #'
 #'
 #'
-#' @export
 formattedErrorMeassage <- function(x) {
     txt <- paste('\n\n<div class="alert alert-danger">',
       gsub('##', '\n', gsub('^##\ Error', '**Error**', x)),

@@ -4,7 +4,9 @@
 ~$
 ^data-raw
 ^docs
+^archive_scripts
 install.R
 app.R
 runtime.txt
 binder
+LICENSE

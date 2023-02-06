@@ -18,7 +18,7 @@ ui <- fluidPage(
              fileInput("file1", "Choose TSV File (REQUIRED)",
                        multiple = FALSE,
                        accept = c("text/tab-separated-values",
-                                  ".tsv", "text/plain")),
+                                  ".tsv",".csv",".tab", "text/plain")),
             #Downsampled input
             checkboxInput("input_downsample", "Downsampled repertoire?", value = TRUE ), 
             #Genome fasta file upload

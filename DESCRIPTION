@@ -1,49 +1,46 @@
 Package: repcred
 Type: Package
-Version: 0.0.0
-Date: 2022-07-07
+Version: 0.0.1
+Date: 2022-02-01
 Authors@R: c(person("Susanna", "Marquez", role=c("aut", "cre"), 
                     email="susanna.marquez@yale.edu"),
                      person("AIRR Community", role=c("cph")))
 Title: Repertoire Credibility 
-Description: Tools to evaluate the credibility of immune repertoires
+Description: A shiny application to generate a report that evaluate the credibility of immune repertoires.
 License: CC BY-SA 4.0
 BugReports: https://github.com/airr-community/rep-cred
-LazyData: true
 BuildVignettes: true
 VignetteBuilder: knitr
 Encoding: UTF-8
 biocViews: DataRepresentation
 Depends:
-    R (>= 3.1.2),
+    R (>= 3.5.0),
     shiny
 Imports:
     airr,
     alakazam,
-    ape,
-    BiocGenerics,
     Biostrings,
-    bookdown,
     data.table,
-    CollessLike,
     dplyr,
-    GenomeInfoDb,
     ggplot2,
-    IRanges,
-    kableExtra,
     knitr,
-    plotly,
-    reticulate,
     rmarkdown,
-    S4Vectors,
-    seqinr,
-    spgs,
-    stringr,
     sumrep,
-    XVector
+    stringr,
+    bookdown,
+    stringi,
+    tidyr,
+    xfun
 Suggests:
     testthat
 Remotes: 
     github::LuciaRotger/CollessLike,
     github::matsengrp/sumrep
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
+Collate:
+    'repcred.R'
+    'cdr3_check.R'
+    'repcred-core.R'
+    'report-functions.R'
+    'sumrep_stats.R'
+    'ui_edit.R'
