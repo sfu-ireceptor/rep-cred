@@ -1,13 +1,5 @@
-install.packages("tidyverse")
-install.packages("rmarkdown")
-install.packages("httr")
-install.packages("shinydashboard")
-install.packages("devtools")
-# Install sumrep
-install.packages(c("alakazam", "ape", "data.table", "dplyr", "entropy", "HDMD", "jsonlite", "kableExtra", "magrittr", "Peptides", "RecordLinkage", "reticulate", "shazam", "seqinr", "spgs", "stringdist", "stringr", "testthat", "textmineR", "yaml"))
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install("Biostrings")
-devtools::install_github("LuciaRotger/CollessLike", ref="master", dependencies=TRUE)
 devtools::install_github("matsengrp/sumrep", ref="master", dependencies=TRUE)
 devtools::install_github("airr-community/rep-cred", ref="master", dependencies=TRUE)
