@@ -55,7 +55,6 @@ library(stringr)
 library(ggplot2)
 library(data.table)
 library(seqinr)
-library(kableExtra)
 
 # Configuration and default values
 gene_data = NA
