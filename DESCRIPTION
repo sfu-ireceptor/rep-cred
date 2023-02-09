@@ -25,6 +25,7 @@ Imports:
     data.table,
     dplyr,
     ggplot2,
+    kableExtra,
     knitr,
     rmarkdown,
     stringr,
@@ -35,7 +36,7 @@ Suggests:
     testthat
 Remotes: 
     matsengrp/sumrep
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Collate:
     'repcred.R'
     'cdr3_check.R'
