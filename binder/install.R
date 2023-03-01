@@ -1,6 +1,6 @@
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-BiocManager::install("Biostrings")
+BiocManager::install(c("Biostrings", "GenomicAlignments", "IRanges"))
 devtools::install_github("LuciaRotger/CollessLike", ref="master", dependencies=TRUE)
 devtools::install_github("matsengrp/sumrep", ref="master", dependencies=TRUE)
 devtools::install_github("airr-community/rep-cred", ref="master", dependencies=TRUE)
