@@ -28,6 +28,7 @@
 #' @import      xfun
 #' @importFrom  airr        read_rearrangement write_rearrangement validate_airr
 #' @importFrom  Biostrings  reverseComplement DNAString pairwiseAlignment nucleotideSubstitutionMatrix
+#' @importFrom  ggpubr      theme_pubclean
 #' @importFrom  kableExtra  kbl
 #' @importFrom  knitr       kable 
 #' @importFrom  data.table  as.data.table data.table .SD

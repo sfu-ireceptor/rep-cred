@@ -25,6 +25,7 @@ Imports:
     data.table,
     dplyr,
     ggplot2,
+    ggpubr,
     kableExtra,
     knitr,
     rmarkdown,
