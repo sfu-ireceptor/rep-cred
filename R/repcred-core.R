@@ -11,11 +11,11 @@ NULL
 #' @export
 repcredWeb <- function(appDir=system.file("shiny-app", 
                                           package = "repcred"), 
-                            port=3838,...) {
+                            port=3838,launch.browser = T,...) {
     if (appDir == "") {
         stop("Could not find app dir.", call. = FALSE)
     }
-    shiny::runApp(appDir, port=port, display.mode = "normal", launch.browser = T,...)
+    shiny::runApp(appDir, port=port, display.mode = "normal", launch.browser = launch.browser,...)
 }
 
 
