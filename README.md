@@ -20,11 +20,22 @@ devtools::install_github('airr-community/rep-cred')
 
 # Running Repcred
 
+## Docker
+
+```
+docker pull ssnn/repcred:devel
+docker run --rm --network host -ti --user shiny -p 3838:3838 ssnn/repcred:devel
+```
+
+## Local installation
+
 Repcred can be started from an R prompt as follows:
 
 ```
 library(repcred)   
 repcredWeb()  
 ```
+
+## Binder
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/airr-community/rep-cred/master?urlpath=shiny/binder/)
