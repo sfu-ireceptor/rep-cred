@@ -25,7 +25,7 @@ params:
    date: !r date()
    echo:  FALSE
    cache: FALSE
-   rep:  !r system.file("extdata/P4_I1.tsv", package = "repcred")
+   rep:  !r system.file("extdata", "P4_I4.tsv", package = "repcred")
    outdir: !r tempdir()
    genome_file: !r NA
    full_or_basic: !r FALSE
@@ -63,38 +63,30 @@ gene_data = NA
 green = "LightGreen"
 amber = "NavajoWhite"
 red = "pink"
-
-sections = 20
-progress = 0
+params
 ```
 
 #  Input parameters 
 
-```{r section1}
+```{r input-parameters}
 #SECTION 1
-# if (is.na(params$genome_file)) {
-#   germline_reference = NULL
-# } else{
-#   germline_reference <-
-#     tigger::readIgFasta(params$genome_file)
-# }
-print(params$genome_file)
-germline_reference = NULL
+if (is.na(params$genome_file)) {
+  germline_reference = NULL
+} else{
+  germline_reference <-
+    tigger::readIgFasta(params$genome_file)
+}
 
 if (params$full_or_basic == "Full sumrep stats") {
   full_check = TRUE
 } else{
   full_check = FALSE
 }
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
-
 params
 ```
 
 
-```{r section2, warning=FALSE}
+```{r warning=FALSE}
 repertoire <- data.table::fread(params$rep)
 # Downsampling unless check box unticked
 num_keep <- 5000
@@ -116,13 +108,10 @@ section_9 = green
 section_10 = green
 section_11 = green
 
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
 ```
 # Quality Control Stats
 
-```{r section3, warning=TRUE,results="asis"}
+```{r warning=TRUE,results="asis"}
 #SECTION 2
 is_compliant <-
   suppressWarnings(airr::validate_rearrangement(repertoire)) # TODO: consider if to display the warning
@@ -137,38 +126,35 @@ if (length(missing_columns) > 0) {
   writeLines("<h3> Columns with missing / No data </h3> ")
   kbl(data.table(column_name = missing_columns))
 }
-
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
 ```
 
 
 # Non-nucleotides in sequence
 
-```{r section4, warning=FALSE}
+```{r warning=FALSE}
 #SECTION 3
-print(check_nucleotides(repertoire)) # TODO: this works only on the sequence column. If missing, should it be changed to sequence_alignment?
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
+check_nucleotides(repertoire) # TODO: this works only on the sequence column. If missing, should it be changed to sequence_alignment?
 ```
 
 # Statistics
 This section provides useful statistics about the repertoire:
 
-### Productive vs. non-productive sequences
-
-```{r section5, fig.cap= "The number of productive and non productive sequences. The x-axis is the productive definition, and the y-axis is the abdunce count.",warning=TRUE}
-#SECTION 4
+```{r}
 repertoire$productive <- as.logical(repertoire$productive)
-prod_info <- data.table("Category"=factor(repertoire$productive, 
-                               levels = c("TRUE","FALSE")))
-non_prod <- any(!repertoire$productive)
-
+non_prod <- F
+if(any(!is.na(repertoire$productive))){
+  prod_info <- data.table("Category"=factor(repertoire$productive, 
+                                 levels = c("TRUE","FALSE")))
+  
+  non_prod <- any(!repertoire$productive)
+}
 vj_column <- "vj_in_frame" %in% colnames(repertoire)&!any(is.na(repertoire$vj_in_frame))
+```
 
-p <- ggplot2::ggplot(
+`r  if(non_prod){"### Productive vs. non-productive sequences"}`
+```{r, fig.cap= "The number of productive and non productive sequences. The x-axis is the productive definition, and the y-axis is the abdunce count.",warning=TRUE, eval=non_prod }
+#SECTION 4
+ggplot2::ggplot(
   prod_info, 
   aes(x = !!as.name("Category"))) +
   ggplot2::geom_bar(stat="count") + 
@@ -176,32 +162,22 @@ p <- ggplot2::ggplot(
   ggplot2::labs(x = "", y = "Occurences") +
   ggplot2::scale_x_discrete(drop = FALSE, labels=c("Productive", "Non-productive", "NA/Not specified"))
 
-plot(p)
 knitr::kable(prod_info %>% 
       dplyr::count(!!as.name("Category"), name = "Occurences", .drop = F) %>% 
       dplyr::mutate("Category" = as.character(!!as.name("Category")),
                     "Category" =  dplyr::recode(!!as.name("Category"),"TRUE"="Productive",
                                              "FALSE"="Non-productive"),
                     "Category" = tidyr::replace_na(!!as.name("Category"),"NA/Not specified")))
-
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
-
 ```
 
 `r  if(vj_column){"### Percentage of sequences where the V and J region are in-frame"}`
 
-```{r section6, eval=vj_column,comment=NA,results="asis"}
+```{r , eval=vj_column,comment=NA,results="asis"}
 writeLines(paste0("Retrived information from the vj_in_frame column, precentage of V-J seuqences in frame: ",formatC(mean(as.logical(repertoire$vj_in_frame))*100,digits = 5),"%"))
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
-
 ```
 `r  if(non_prod){"### Non-productive sequences breakdown"}`
 
-```{r section7, fig.cap= "A breakdown of the type of non-productive sequences. The x-axis is the non-productive type, and the y-axis is the abdunce count. The red color represents sequences that has both a stop codon and the V-J is not in frame, gray color represents sequences that are in either types.", warning=TRUE, eval=non_prod}
+```{r, fig.cap= "A breakdown of the type of non-productive sequences. The x-axis is the non-productive type, and the y-axis is the abdunce count. The red color represents sequences that has both a stop codon and the V-J is not in frame, gray color represents sequences that are in either types.", warning=TRUE, eval=non_prod}
 ### table the columns that indicate non-productive sequences.
 
 cols <- c("vj_in_frame","stop_codon")
@@ -249,16 +225,9 @@ knitr::kable(data.frame("Category" = c("Contains stop codons",
                                              "stop_codon"="Contains stop codons")))
 ```
 
-```{r, warning=FALSE}
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
-```
-
-
 ### Sequence length distribution
 
-```{r section8, fig.cap="The sequences length distribution. The x-axis is the binned sequence lengths, and the y-axis is the frequency.", warning=FALSE,results="asis"}
+```{r, fig.cap="The sequences length distribution. The x-axis is the binned sequence lengths, and the y-axis is the frequency.", warning=FALSE,results="asis"}
 
 
 length_info <- data.frame(region = c(rep("Input sequence",nrow(repertoire)),
@@ -268,79 +237,58 @@ length_info <- data.frame(region = c(rep("Input sequence",nrow(repertoire)),
 
 ggplot2::ggplot(
   length_info, 
-  aes(x = !!as.name("lengths"))) +
+  ggplot2::aes(x = !!as.name("lengths"))) +
   ggplot2::geom_histogram(bins = 30) + 
   ggpubr::theme_pubclean() +
   ggplot2::labs(x = "", y = "Frequency") +
-  ggplot2::facet_grid(cols = vars(!! sym("region")))
+  ggplot2::facet_grid(cols = ggplot2::vars(!! ggplot2::sym("region")))
   
 
-length_info <- length_info %>% dplyr::group_by(!!as.name("region")) %>%
+length_info %>% dplyr::group_by(!!as.name("region")) %>%
   dplyr::summarise(
-    Min = min(!!as.name("lengths")),
-    Max = max(!!as.name("lengths")),
-    Mean = mean(!!as.name("lengths")),
-    Median = median(!!as.name("lengths")),
-    SD = sd(!!as.name("lengths")),
-    "q5" = quantile(!!as.name("lengths"), probs = c(0.05)),
-    "q95" = quantile(!!as.name("lengths"), probs = c(0.95)),
+    Min = min(!!as.name("lengths"), na.rm = T),
+    Max = max(!!as.name("lengths"), na.rm = T),
+    Mean = mean(!!as.name("lengths"), na.rm = T),
+    Median = median(!!as.name("lengths"), na.rm = T),
+    SD = sd(!!as.name("lengths"), na.rm = T),
+    "q5" = quantile(!!as.name("lengths"), probs = c(0.05), na.rm = T),
+    "q95" = quantile(!!as.name("lengths"), probs = c(0.95), na.rm = T),
   )
 knitr::kable(length_info)
 ```
-
-```{r, warning=FALSE}
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
-```
-
 # Annotation Calls Statistics
 
-```{r section9}
+## Number of unique allele calls per gene
+
+```{r}
 v_usage_info <- getGeneAlleleStat(repertoire, reference = germline_reference, call = "v_call")
 d_usage_info <- getGeneAlleleStat(repertoire, reference = germline_reference, call = "d_call")
 j_usage_info <- getGeneAlleleStat(repertoire, reference = germline_reference, call = "j_call")
 
-appearance_info <- dplyr::bind_rows(v_usage_info$gene_data,
+appearance_info <- bind_rows(v_usage_info$gene_data,
                              d_usage_info$gene_data,
                              j_usage_info$gene_data)
 
 appearance_info$segment <- substr(appearance_info$gene,1,4)
-```
 
-```{r, warning=FALSE}
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
-```
-
-## Number of unique allele calls per gene
-
-```{r section10, warning=TRUE, fig.subcap=c("Unique allele calls per gene. Each row is a different gene segment (V/D/J). The x-axis is the different genes, and the y-axis is the count."),results="asis"}
-segments <- length(unique(appearance_info$segment))
 size <- max(table(appearance_info$segment))
-g <- ggplot2::ggplot(appearance_info, 
+```
+
+```{r fig.height=size, warning=TRUE, fig.subcap=c("Unique allele calls per gene. Each row is a different gene segment (V/D/J). The x-axis is the different genes, and the y-axis is the count."),results="asis"}
+ggplot2::ggplot(appearance_info, 
   ggplot2::aes(x = !!as.name("gene"), y = !!as.name("count_unique_alleles"))) +
   ggplot2::geom_col() + 
   ggpubr::theme_pubclean() +
   #ggplot2::theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
   ggplot2::labs(x = "", y = "# of unique alleles") +
   ggplot2::facet_wrap(vars(!! sym("segment")), nrow = 1, 
-                      ncol = segments,
+                      ncol = 3,
                       scales = "free") + coord_flip()
 
-subchunkify(g, fig_height=size, fig_width=size/3)
 ```
-
-```{r, warning=FALSE}
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
-```
-
 ## Relative usage
 
-```{r section11, fig.height=size, warning=TRUE, fig.subcap=c("Gene usage. Each row is a different gene segment (V/D/J). The x-axis is the different genes, and the y-axis is the relative usage."),results="asis"}
+```{r fig.height=size, warning=TRUE, fig.subcap=c("Gene usage. Each row is a different gene segment (V/D/J). The x-axis is the different genes, and the y-axis is the relative usage."),results="asis"}
 
 usage_info <- appearance_info %>%
   dplyr::group_by(!!as.name("segment")) %>%
@@ -348,29 +296,19 @@ usage_info <- appearance_info %>%
   dplyr::group_by(!!as.name("segment"),!!as.name("gene")) %>%
   dplyr::summarise("fraction" = !!as.name("frequency")/unique(!!as.name("n")))
 
-segments <- length(unique(usage_info$segment))
-size <- max(table(usage_info$segment))
-g <- ggplot2::ggplot(usage_info, 
+ggplot2::ggplot(usage_info, 
   ggplot2::aes(x = !!as.name("gene"), y = !!as.name("fraction"))) +
   ggplot2::geom_col() + 
   ggpubr::theme_pubclean() +
   #ggplot2::theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
   ggplot2::labs(x = "", y = "Relative usage") +
   ggplot2::facet_wrap(vars(!! sym("segment")), nrow = 1, 
-                      ncol = segments,
+                      ncol = 3,
                       scales = "free") + coord_flip()
 
-subchunkify(g, fig_height=size, fig_width=size/3)
-
 ```
 
-```{r, warning=FALSE}
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
-```
-
-```{r section12, warning=TRUE,results="asis"}
+```{r warning=TRUE,results="asis"}
 # TODO: missing primers, gene frequency. 
 
 ## get gene usage. Get the genes with alakazam getGene and calculate the relative usage. If germline is supplied. Display only genes within the germline. Else show all.
@@ -440,23 +378,18 @@ if (shiny::isRunning())
 
 ```
 
-```{r, warning=FALSE}
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
-```
 
 # General Sumrep Statistics
 
-```{r section13, warning=TRUE,results="asis"}
+```{r warning=TRUE,results="asis"}
 
 ### summrep statistics graphs = hot/cold spots, GC content, Mutation and germline
 
 ### hot cold, and GC based on the sequence_alignment column
 
-hot_data <- sumrep::getHotspotCountDistribution(repertoire)
-cold_data <- sumrep::getColdspotCountDistribution(repertoire)
-gc_data <- sumrep::getGCContentDistribution(repertoire)
+hot_data <- getHotspotCountDistribution(repertoire)
+cold_data <- getColdspotCountDistribution(repertoire)
+gc_data <- getGCContentDistribution(repertoire)
 
 sumrep_info <- data.frame(
   "Category" = c(rep("HotSpot",length(hot_data)),
@@ -466,6 +399,17 @@ sumrep_info <- data.frame(
 )
 
 sumrep_info$Category <- factor(sumrep_info$Category, levels = c("HotSpot","ColdSpot","GC content"))
+
+ggplot2::ggplot(sumrep_info,
+                ggplot2::aes_string(x=1,y="values" ,color="Category")) + 
+  ggplot2::geom_violin() + 
+  ggplot2::geom_boxplot(width = 0.2, outlier.shape = NA) + 
+  ggplot2::guides(color = "none") + 
+  ggpubr::theme_pubclean() +
+  ggplot2::labs(x="",y="") + 
+  facet_wrap(c("Category"), scales = "free", drop = T)
+
+
 
 #SECTION 6
 plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
@@ -481,190 +425,156 @@ gcContentDistribution(repertoire)
 }
 
 
-if("sequence_alignment" %in% colnames(repertoire) & "germline_alignment" %in% colnames(repertoire) &  !any(is.na(repertoire$sequence_alignment))& !any(is.na(repertoire$germline_alignment))){
- positionDistancesBetweenMutationDistribution(repertoire)
- distanceFromGermlineToSequenceDistribution(repertoire)  
-}else{
-   if(section_6 == amber){
-      section_6 = red
-   }else{
-      section_6 = amber
-   }
-   writeLines("Missing columns : sequence_alignment , germline_alignment  \n Unable to run statistics : positionDistancesBetweenMutationDistribution , distanceFromGermlineToSequenceDistribution")
-}
+# if("sequence_alignment" %in% colnames(repertoire) & "germline_alignment" %in% colnames(repertoire) &  !any(is.na(repertoire$sequence_alignment))& !any(is.na(repertoire$germline_alignment))){
+#  positionDistancesBetweenMutationDistribution(repertoire)
+#  distanceFromGermlineToSequenceDistribution(repertoire)  
+# }else{
+#    if(section_6 == amber){
+#       section_6 = red
+#    }else{
+#       section_6 = amber
+#    }
+#    writeLines("Missing columns : sequence_alignment , germline_alignment  \n Unable to run statistics : positionDistancesBetweenMutationDistribution , distanceFromGermlineToSequenceDistribution")
+# }
 
 ```
 
-```{r, warning=FALSE}
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
-```
 
 
+```{r warning=TRUE,results="asis"}
 #  Pairwise Statistics
 
-```{r section14, warning=TRUE,results="asis"}
-#SECTION 7
-if(isTRUE(full_check)){
- plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
-legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
-
-if("sequence_alignment" %in% colnames(repertoire)&!any(is.na(repertoire$sequence_alignment))){
-CDR3pairwiseDistanceInfo(repertoire)
-pairwiseDistDistribution(repertoire)
-#nearestNeighbourDistInfo(repertoire) ## TODO: takes to long to run.
-}else{
-   section_7 = red
-   writeLines("Missing column : Sequence_alignment \n Unable to run statistics")
-}
-}else{
-   writeLines("Only the basic statistics were run.Please see other sections for the other statistics.")
-}
+# #SECTION 7
+# if(isTRUE(full_check)){
+#  plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
+# legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
+# 
+# if("sequence_alignment" %in% colnames(repertoire)&!any(is.na(repertoire$sequence_alignment))){
+# CDR3pairwiseDistanceInfo(repertoire)
+# pairwiseDistDistribution(repertoire)
+# nearestNeighbourDistInfo(repertoire)
+# }else{
+#    section_7 = red
+#    writeLines("Missing column : Sequence_alignment \n Unable to run statistics")
+# }
+# }else{
+#    writeLines("Only the basic statistics were run.Please see other sections for the other statistics.")
+# }
 
 
 ```
 
-```{r, warning=FALSE}
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
-```
 
 
+```{r}
 #  Physiochemical Statistics
-
-```{r section15}
-if (all(is.na(repertoire$junction_aa))) {
-    print("Skipping this section: `juncation_aa` is empty.")
-}
-```
-
-```{r, warning=FALSE}
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
+# if (all(is.na(repertoire$junction_aa))) {
+#     print("Skipping this section: `juncation_aa` is empty.")
+# }
 ```
 
 
-```{r section16, warning=TRUE,results="asis",eval=!all(is.na(repertoire$junction_aa))}
+```{r warning=TRUE,results="asis",eval=!all(is.na(repertoire$junction_aa))}
 #SECTION 8
-plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
-legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
-
-
-#polarityDistribution(repertoire)
-#aromaticityDistribution(repertoire)
-#acidityDistribution(repertoire)
-#basicityDistribution(repertoire)
-# bulkinessDistribution(repertoire)
-# chargeDistribution(repertoire)
-aliphaticDistribution(repertoire)
-print(mean(getAliphaticIndexDistribution(repertoire)),nm.rm=TRUE)
-GRAVYDistribution(repertoire)
+# plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
+# legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
+# 
+# 
+# #polarityDistribution(repertoire)
+# #aromaticityDistribution(repertoire)
+# #acidityDistribution(repertoire)
+# #basicityDistribution(repertoire)
+# # bulkinessDistribution(repertoire)
+# # chargeDistribution(repertoire)
+# aliphaticDistribution(repertoire)
+# print(mean(getAliphaticIndexDistribution(repertoire)),nm.rm=TRUE)
+# GRAVYDistribution(repertoire)
 
 ```
 
-```{r, warning=FALSE}
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
-```
 
 
+
+```{r warning=TRUE,results="asis"}
 #  Insertion Length Distributions
-
-```{r section17, warning=TRUE,results="asis"}
 #SECTION 9
-plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
-legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
-if("np1_length" %in% colnames(repertoire)&!any(is.na(repertoire$np1_length))){
- VJinsertionLengthDistribution(repertoire)
- VDinsertionLengthDistribution(repertoire)
-}else{
- writeLines("Missing Column : np1_length")  
-}
-if("np2_length" %in% colnames(repertoire)&!any(is.na(repertoire$np2_length))){
-DJinsertionLengthDistribution(repertoire)
-}else{
-   writeLines("Missing Column : np2_length")  
-}
-```
-
-```{r, warning=FALSE}
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
+# plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
+# legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
+# if("np1_length" %in% colnames(repertoire)&!any(is.na(repertoire$np1_length))){
+#  VJinsertionLengthDistribution(repertoire)
+#  VDinsertionLengthDistribution(repertoire)
+# }else{
+#  writeLines("Missing Column : np1_length")  
+# }
+# if("np2_length" %in% colnames(repertoire)&!any(is.na(repertoire$np2_length))){
+# DJinsertionLengthDistribution(repertoire)
+# }else{
+#    writeLines("Missing Column : np2_length")  
+# }
 ```
 
 
+```{r warning=TRUE,results="asis"}
+#SECTION 10
 #  Prime deletion Distributions Statistics
 
-```{r section18, warning=TRUE,results="asis"}
-#SECTION 10
-
-plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
-legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
-
-missing_col_count = 0
-##
-if("v_3p_del" %in% colnames(repertoire)&!any(is.na(repertoire$v_3p_del))){
- VGene3PrimeDeletionLengthDistribution(repertoire)  
-missing_col_count = missing_col_count +1
-}else{
-   writeLines("\n Missing column : v_3p_del , Cannot run statistic \n")
-}
-if("v_5p_del" %in% colnames(repertoire)&!any(is.na(repertoire$v_5p_del))){
- VGene5PrimeDeletionLengthDistribution(repertoire) 
-   missing_col_count = missing_col_count +1
-}else{
-   writeLines("Missing column : v_5p_del , Cannot run statistic \n")
-}
-##
-if("d_3p_del" %in% colnames(repertoire)&!any(is.na(repertoire$d_3p_del))){
-DGene3PrimeDeletionLengthDistribution(repertoire)
-   missing_col_count = missing_col_count +1
-}else{
-   writeLines("Missing column : d_3p_del , Cannot run statistic \n")
-}
-if("d_5p_del" %in% colnames(repertoire)&!any(is.na(repertoire$d_5p_del))){
-DGene5PrimeDeletionLengthDistribution(repertoire)
-   missing_col_count = missing_col_count +1
-}else{
-   writeLines("Missing column : d_5p_del , Cannot run statistic \n")
-}
-##
-if("j_3p_del" %in% colnames(repertoire)&!any(is.na(repertoire$j_3p_del))){
-JGene3PrimeDeletionLengthDistribution(repertoire)
-   missing_col_count = missing_col_count +1
-}else{
-   writeLines("Missing column : j_3p_del , Cannot run statistic \n")
-}
-if("j_5p_del" %in% colnames(repertoire)&!any(is.na(repertoire$j_5p_del))){
-JGene5PrimeDeletionLengthDistribution(repertoire)
-   missing_col_count = missing_col_count +1
-}else{
-   writeLines("Missing column : j_5p_del , Cannot run statistic \n")
-}
-
-if(missing_col_count > 3){
-   section_10=red
-}
-if(missing_col_count > 0){
-   section_10=amber
-}
+# plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
+# legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
+# 
+# missing_col_count = 0
+# ##
+# if("v_3p_del" %in% colnames(repertoire)&!any(is.na(repertoire$v_3p_del))){
+#  VGene3PrimeDeletionLengthDistribution(repertoire)  
+# missing_col_count = missing_col_count +1
+# }else{
+#    writeLines("\n Missing column : v_3p_del , Cannot run statistic \n")
+# }
+# if("v_5p_del" %in% colnames(repertoire)&!any(is.na(repertoire$v_5p_del))){
+#  VGene5PrimeDeletionLengthDistribution(repertoire) 
+#    missing_col_count = missing_col_count +1
+# }else{
+#    writeLines("Missing column : v_5p_del , Cannot run statistic \n")
+# }
+# ##
+# if("d_3p_del" %in% colnames(repertoire)&!any(is.na(repertoire$d_3p_del))){
+# DGene3PrimeDeletionLengthDistribution(repertoire)
+#    missing_col_count = missing_col_count +1
+# }else{
+#    writeLines("Missing column : d_3p_del , Cannot run statistic \n")
+# }
+# if("d_5p_del" %in% colnames(repertoire)&!any(is.na(repertoire$d_5p_del))){
+# DGene5PrimeDeletionLengthDistribution(repertoire)
+#    missing_col_count = missing_col_count +1
+# }else{
+#    writeLines("Missing column : d_5p_del , Cannot run statistic \n")
+# }
+# ##
+# if("j_3p_del" %in% colnames(repertoire)&!any(is.na(repertoire$j_3p_del))){
+# JGene3PrimeDeletionLengthDistribution(repertoire)
+#    missing_col_count = missing_col_count +1
+# }else{
+#    writeLines("Missing column : j_3p_del , Cannot run statistic \n")
+# }
+# if("j_5p_del" %in% colnames(repertoire)&!any(is.na(repertoire$j_5p_del))){
+# JGene5PrimeDeletionLengthDistribution(repertoire)
+#    missing_col_count = missing_col_count +1
+# }else{
+#    writeLines("Missing column : j_5p_del , Cannot run statistic \n")
+# }
+# 
+# if(missing_col_count > 3){
+#    section_10=red
+# }
+# if(missing_col_count > 0){
+#    section_10=amber
+# }
 ```
 
-```{r, warning=FALSE}
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
-```
 
 
 #  Possible Chimerisms
 Below table shows the comparison between the total number of sequences compares to the total number of unique CDR3 sequences and then compared to the number of CDR3 sequences that have multiple different v-call genes associated with them.
-```{r section19, CDR3_Chimera_Check, warning = TRUE ,fig.width=9}
+```{r CDR3_Chimera_Check, warning = TRUE ,fig.width=9}
 #SECTION 11
 if(full_check == TRUE){
 repertoire = repertoire[!is.na(repertoire$sequence),]
@@ -696,24 +606,17 @@ barplot(seqs_stats_vals,names.arg = labels,col='dark blue',xlab="Occurences" ,ma
 
 
 freq_table$Var2 <- as.factor(freq_table$Var2)
-ggplot(freq_table,aes(x=Var2,y=Freq,fill=Var1))+geom_bar(stat="identity")+guides(
-  #fill = "none", 
-  x=guide_axis(angle=90))+labs(x="Gene",y="Number of sequences present")
+ggplot(freq_table,aes(x=Var2,y=Freq,fill=Var1))+geom_bar(stat="identity")+guides(fill = "none", x=guide_axis(angle=90))+labs(x="Gene",y="Number of sequences present")
 }else{
    writeLines("Only Basic stats were run , if you would like to get stats of possible chimeric sequences please run full stats.")
    section_11 = "DarkGrey"
 }
 ```
-```{r, warning=FALSE}
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
-```
 
 
 Below contain CDR3 sequences with more than one v_call:
 
-```{r section20, warning = TRUE, results="asis" } 
+```{r warning = TRUE, results="asis" } 
 options(width = 2000)
 num_to_display=0
 if(length(repertoire$sequence)>100000){
@@ -724,28 +627,15 @@ if(length(repertoire$sequence)>100000){
 
 # if(seq_type == "")
 # display_type
-#if (full_check == TRUE){
-plotVgeneDist(cdr3_vcalls,num_to_display, "aa",multiple_vgene_freq)#}
+if (full_check == TRUE){
+plotVgeneDist(cdr3_vcalls,num_to_display, "aa",multiple_vgene_freq)}
 #kbl(most_chimeric)
 ```
 
-```{r, warning=FALSE}
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
-```
-
-```{r section21, warning = TRUE, results="asis"}
+```{r warning = TRUE, results="asis"}
 #kbl(as.data.table(findAmplificationAreas(repertoire)))
 
 addTrafficLighting(c(section_1,section_2,section_3,section_4,section_5,section_6,section_7,section_8,section_9,section_10,section_11))
 ```
-
-```{r, warning=FALSE}
-if (shiny::isRunning())
-  progress = progress + 1/sections
-  shiny::setProgress(progress)  # set progress to 1/sections
-```
-
 
 

@@ -1,6 +1,5 @@
 ##### rep-cred functions for index.Rmd
 #' @include repcred.R
-NULL
 
 ##########################################################################
 # color functions
@@ -62,13 +61,13 @@ detail_nucleotide <-
     )
   }
 
-# check_nucleotides check the input sequence of AIRR format data for non nucleotides content.
-# In case of non-nucleotide content found, a detail report is printed.
-# 
-# @param repertoire Repertoire data.frame in AIRR format
-# 
-# @return  a list of descriptive statistics of the non-nucliotide characters
-# 
+#' check_nucleotides check the input sequence of AIRR format data for non nucleotides content.
+#' In case of non-nucleotide content found, a detail report is printed.
+#' 
+#' @param repertoire Repertoire data.frame in AIRR format
+#' 
+#' @return  a list of descriptive statistics of the non-nucliotide characters
+#' @export
 check_nucleotides <- function(repertoire) {
   non_nucs = str_replace_all(repertoire$sequence, "[ACGTacgt]", "")
   non_nucs = non_nucs[!is.na(non_nucs)]
@@ -87,24 +86,6 @@ check_nucleotides <- function(repertoire) {
   } else {
     cat("None found.")
   }
-}
-
-##########################################################################
-
-# controls the size of a plot within a chunk
-subchunkify <- function(g, fig_height=7, fig_width=5) {
-  g_deparsed <- paste0(deparse(
-    function() {g}
-  ), collapse = '')
-  
-  sub_chunk <- paste0("```{r sub_chunk_", floor(runif(1) * 10000), ", fig.height=",
-                      fig_height, ", fig.width=", fig_width, ", echo=FALSE}",
-                      "\n(", 
-                      g_deparsed
-                      , ")()",
-                      "\n```")
-  
-  cat(knitr::knit(text = knitr::knit_expand(text = sub_chunk), quiet = TRUE))
 }
 
 ##########################################################################
@@ -127,15 +108,15 @@ checkNonCodingNucleotides <- function(seq) {
   
 }
 
-# The categorize the non productive records and returns a detailed statistics
-#
-# @param repertoire Repertoire data.frame in AIRR format
-#
-# @return
-#
-# a data.frame with the counts of the non-productive categories.
-#
-# 
+#' The categorize the non productive records and returns a detailed statistics
+#'
+#' @param repertoire Repertoire data.frame in AIRR format
+#'
+#' @return
+#'
+#' a data.frame with the counts of the non-productive categories.
+#'
+#' @export
 fullCheckNonProductiveSeqs <- function(repertoire) {
   idx <- which(!repertoire$productive)
   idx_rev <- which(as.logical(repertoire$rev_comp[idx])==T)
@@ -158,31 +139,31 @@ fullCheckNonProductiveSeqs <- function(repertoire) {
 
 ###########################################################################################
 # repcred-core.R
-# findMissingColumns returns a vector containing the names of columns that contain any
-# NA values.
-#@param data repertoire file in data table format
-#
-#
+#' findMissingColumns returns a vector containing the names of columns that contain any
+#' NA values.
+#'@param data repertoire file in data table format
+#'
+#'@export
 findMissingColumns <- function(data) {
   missing_columns = names(which(sapply(data, anyNA)))
   return(missing_columns)
 }
 
 ############################################################################################
-# Create the V(D)J gene and allele statistics, counts the frequency of each unique call,
-# number of unique alleles per gene. If a reference set is provided the calls are matched to the 
-# reference and indicated if they were present in the reference.
-#
-# @param repertoire Repertoire dataset in airr format
-# @param reference  A V(D)J germline reference set 
-# @param call       The V(D)J call to summarise
-# 
-# @return 
-# 
-# A list of two dataframes, allele_data contains the information on the allele frequency and
-# gene_data on the gene frequency
-# 
-# 
+#' Create the V(D)J gene and allele statistics, counts the frequency of each unique call,
+#' number of unique alleles per gene. If a reference set is provided the calls are matched to the 
+#' reference and indicated if they were present in the reference.
+#'
+#' @param repertoire Repertoire dataset in airr format
+#' @param reference  A V(D)J germline reference set 
+#' @param call       The V(D)J call to summarise
+#' 
+#' @return 
+#' 
+#' A list of two dataframes, allele_data contains the information on the allele frequency and
+#' gene_data on the gene frequency
+#' 
+#' @export
 getGeneAlleleStat <- function(repertoire, reference = NULL, call="v_call") {
   
   ## get allele-call proportion

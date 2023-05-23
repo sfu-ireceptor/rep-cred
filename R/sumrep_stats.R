@@ -5,6 +5,122 @@
 #' @include repcred.R
 NULL
 
+### functions taken from sumrep
+
+checkColumn <- function(dat, column) {
+  column_check <- alakazam::checkColumns(dat, column)
+  if(column_check != TRUE) {
+    stop(column_check)
+  }
+}
+
+getColumnValues <- function(dat, column) {
+  checkColumn(dat, column)
+  column_values <- dat[[column]]
+  return(column_values)
+}
+
+getColumnSequences <- function (dat, column, drop_gaps, remove_stop_codon_seqs = TRUE, 
+          in_frame_only = TRUE) 
+{
+  if (remove_stop_codon_seqs) {
+    tryCatch({
+      checkColumn(dat, "stop_codon")
+      dat <- dat[!dat[["stop_codon"]], ]
+    }, error = function(e) {
+      cat("\nWarning: stop_codon column not present.\n")
+      cat("  Unable to remove sequences with stop codons.\n\n")
+    })
+  }
+  if (in_frame_only) {
+    tryCatch({
+      checkColumn(dat, "vj_in_frame")
+      dat <- dat[dat[["vj_in_frame"]], ]
+    }, error = function(e) {
+      cat("Warning: vj_in_frame column not present.\n")
+      cat("  Unable to remove sequences with out-of-frame V or J segments.\n\n")
+    })
+  }
+  sequences <- dat %>% getColumnValues(column = column)
+  if (drop_gaps) {
+    sequences <- sequences %>% sapply(function(x) {
+      gsub(x, pattern = "\\.|\\-", replacement = "")
+    }) %>% unname
+  }
+  return(sequences)
+}
+
+getMotifCount <- function (motif, dna_sequences) 
+{
+  dna_strings <- dna_sequences %>% unlist %>% Biostrings::DNAStringSet()
+  count <- motif %>% Biostrings::vcountPattern(dna_strings, 
+                                               fixed = FALSE)
+  return(count)
+}
+
+getSpotCount <- function (dna_sequences, spots, average_over_sequence_length = TRUE) 
+{
+  spot_counts <- spots %>% sapply(getMotifCount, dna_sequences = dna_sequences)
+  if (dim(spot_counts) %>% is.null) {
+    total_count <- spot_counts %>% sum
+  }
+  else {
+    total_count <- spot_counts %>% apply(1, sum)
+  }
+  if (average_over_sequence_length) {
+    lens <- dna_sequences %>% sapply(nchar)
+    total_count <- total_count/lens
+  }
+  return(total_count)
+}
+
+getColdspotCount <- function (dat, column = "sequence_alignment", coldspots = "SYC", 
+          ...) 
+{
+  return(getSpotCount(dna_sequences = getColumnSequences(dat, 
+                                                         column, drop_gaps = FALSE), spots = coldspots, ...))
+}
+
+getHotspotCount <- function (dat, column = "sequence_alignment", hotspots = c("WRC", 
+                                                                              "WA"), ...) 
+{
+  return(getSpotCount(spots = hotspots, dna_sequences = getColumnSequences(dat, 
+                                                                           column, drop_gaps = FALSE), ...))
+}
+
+getHotspotCountDistribution <- function (dat, column = "sequence_alignment", hotspots = c("WRC", 
+                                                           "WA"), ...) 
+{
+  counts <- dat %>% getHotspotCount(column = column, hotspots = hotspots, 
+                                      ...)
+  return(counts)
+}
+
+getColdspotCountDistribution <- function (dat, column = "sequence_alignment", coldspots="SYC", ...) 
+{
+  counts <- dat %>% getColdspotCount(column = column, coldspots = coldspots, 
+                                    ...)
+  return(counts)
+}
+
+getGCContent <- function (raw_sequences) 
+{
+  sequence_list <- raw_sequences %>% sapply(paste, collapse = "") %>% 
+    unname
+  dna_list <- sequence_list %>% strsplit(split = "") %>% lapply(ape::as.DNAbin)
+  gc_dist <- dna_list %>% sapply(ape::GC.content)
+  return(gc_dist)
+}
+
+getGCContentDistribution <- function (dat, column = "sequence_alignment", approximate = FALSE, 
+          ...) 
+{
+  sequence_list <- getColumnSequences(dat, column, drop_gaps = FALSE)
+  distribution <- sequence_list %>% getGCContent
+  return(distribution)
+}
+
+
 # Generate plot statistics
 # 
 #plotStats takes the data to be plotted, the statistics about said data and then two
@@ -43,35 +159,35 @@ plotStats<-function(data,stats , main_text , xlab_text){
 # getCDR3PairwiseDistanceDistribution()
 # @param data repertoire data file in data.table format
 # 
-CDR3pairwiseDistanceInfo <- function(data){
-    cdr3_pairwise_distance = getCDR3PairwiseDistanceDistribution(data)
-    stats <- getCoreStats(cdr3_pairwise_distance)
-    plotStats(cdr3_pairwise_distance,stats,"Histogram of CDR 3 pairwise distance distribtuion", "Distance value")
-    print(kable(stats))
-  }
+# CDR3pairwiseDistanceInfo <- function(data){
+#     cdr3_pairwise_distance = getCDR3PairwiseDistanceDistribution(data)
+#     stats <- getCoreStats(cdr3_pairwise_distance)
+#     plotStats(cdr3_pairwise_distance,stats,"Histogram of CDR 3 pairwise distance distribtuion", "Distance value")
+#     print(kable(stats))
+#   }
 
 # Creates a plot and statistics from the output data of the sumrep function :
 # getNearestNeighborDistribution()
 # @param data repertoire data file in data.table format
 # 
-nearestNeighbourDistInfo <- function(data){
-  nn_distribution = getNearestNeighborDistribution(data)
-  stats <- getCoreStats(nn_distribution)
-  plotStats(nn_distribution,stats,"Histogram of Nearest Neighbour distance distribtuion", "Distance value")
-  print(kable(stats))
-  
-} 
-
+# nearestNeighbourDistInfo <- function(data){
+#   nn_distribution = getNearestNeighborDistribution(data)
+#   stats <- getCoreStats(nn_distribution)
+#   plotStats(nn_distribution,stats,"Histogram of Nearest Neighbour distance distribtuion", "Distance value")
+#   print(kable(stats))
+#   
+# } 
+# 
 # Creates a plot and statistics from the output data of the sumrep function :
 # getPairwiseDistanceDistribution()
 # @param data repertoire data file in data.table format
 # 
-pairwiseDistDistribution <- function(data){
-  pairwise_distribution = getPairwiseDistanceDistribution(data,column = "sequence")
-  stats <- getCoreStats(pairwise_distribution)
-  plotStats(pairwise_distribution,stats,"Histogram of Pairwise Distance distribtuion", "Distance value")
-  print(kable(stats))
-}
+# pairwiseDistDistribution <- function(data){
+#   pairwise_distribution = getPairwiseDistanceDistribution(data,column = "sequence")
+#   stats <- getCoreStats(pairwise_distribution)
+#   plotStats(pairwise_distribution,stats,"Histogram of Pairwise Distance distribtuion", "Distance value")
+#   print(kable(stats))
+# }
 
 # Creates a plot and statistics from the output data of the sumrep function :
 # getGCContentDistribution()
@@ -96,64 +212,64 @@ gcContentDistribution<- function(data){
 # getAliphaticIndexDistribution()
 # @param data repertoire data file in data.table format
 # 
-aliphaticDistribution<- function(data){
-  aliph_distribution = getAliphaticIndexDistribution(data)
-  stats <- getCoreStats(aliph_distribution)
-  plotStats(aliph_distribution,stats,"Histogram of Aliphatic Index distribtuion", "Aliphatic Index")
-  print(kable(stats))
-}
+# aliphaticDistribution<- function(data){
+#   aliph_distribution = getAliphaticIndexDistribution(data)
+#   stats <- getCoreStats(aliph_distribution)
+#   plotStats(aliph_distribution,stats,"Histogram of Aliphatic Index distribtuion", "Aliphatic Index")
+#   print(kable(stats))
+# }
 
 # Creates a plot and statistics from the output data of the sumrep function :
 # getGRAVYDistribution()
 # @param data repertoire data file in data.table format
 # 
-GRAVYDistribution<- function(data){
-  gravy_distribution = getGRAVYDistribution(data)
-  stats <- getCoreStats(gravy_distribution)
-  plotStats(gravy_distribution,stats,"Histogram of GRAVY distribtuion", "GRAVY indices")
-  print(kable(stats))
-}
+# GRAVYDistribution<- function(data){
+#   gravy_distribution = getGRAVYDistribution(data)
+#   stats <- getCoreStats(gravy_distribution)
+#   plotStats(gravy_distribution,stats,"Histogram of GRAVY distribtuion", "GRAVY indices")
+#   print(kable(stats))
+# }
 
 # Creates a plot and statistics from the output data of the sumrep function :
 # getPositionalDistanceBetweenMutationsDistribution()
 # @param data repertoire data file in data.table format
 # 
-positionDistancesBetweenMutationDistribution <- function(data){
-  pos_distribution<-getPositionalDistanceBetweenMutationsDistribution(data)
-  stats <- getCoreStats(pos_distribution)
-  plotStats(pos_distribution,stats,"Histogram of distance between mutations", "Distance value")
-  print(kable(stats))
-}
+# positionDistancesBetweenMutationDistribution <- function(data){
+#   pos_distribution<-getPositionalDistanceBetweenMutationsDistribution(data)
+#   stats <- getCoreStats(pos_distribution)
+#   plotStats(pos_distribution,stats,"Histogram of distance between mutations", "Distance value")
+#   print(kable(stats))
+# }
 # Creates a plot and statistics from the output data of the sumrep function :
 # getDistanceFromGermlineToSequenceDistribution()
 # @param data repertoire data file in data.table format
 # 
-distanceFromGermlineToSequenceDistribution <- function(data){
-  lev_distribution_germline_to_seq<-getDistanceFromGermlineToSequenceDistribution(data)
-  stats <- getCoreStats(lev_distribution_germline_to_seq)
-  plotStats(lev_distribution_germline_to_seq,stats,"Histogram of levenshtein from germline alignment to sequence alignment", "Distance value")
-  print(kable(stats))
-}
+# distanceFromGermlineToSequenceDistribution <- function(data){
+#   lev_distribution_germline_to_seq<-getDistanceFromGermlineToSequenceDistribution(data)
+#   stats <- getCoreStats(lev_distribution_germline_to_seq)
+#   plotStats(lev_distribution_germline_to_seq,stats,"Histogram of levenshtein from germline alignment to sequence alignment", "Distance value")
+#   print(kable(stats))
+# }
 # Creates a plot and statistics from the output data of the sumrep function :
 # getPerGeneMutationRates()
 # @param data repertoire data file in data.table format
 
-perGeneMutationRates <- function(data){
-  gene_mut <- getPerGeneMutationRates(data)
-  stats <- getCoreStats(gene_mut)
-  plotStats(gene_mut,stats,"Histogram of gene mutation rates", "Mutation Rate Value")
-  print(kable(stats))
-}
+# perGeneMutationRates <- function(data){
+#   gene_mut <- getPerGeneMutationRates(data)
+#   stats <- getCoreStats(gene_mut)
+#   plotStats(gene_mut,stats,"Histogram of gene mutation rates", "Mutation Rate Value")
+#   print(kable(stats))
+# }
 # Creates a plot and statistics from the output data of the sumrep function :
 # perGenePerPositionMutationRates()
 # @param data repertoire data file in data.table format
 
-perGenePerPositionMutationRates <- function(data){
-  gene_mut_pos <- perGenePerPositionMutationRates(data)
-  stats <- getCoreStats(gene_mut_pos)
-  plotStats(gene_mut_pos,stats,"Histogram of gene mutation rates , per position", "Mutation Rate Value per Position")
-  print(kable(stats))
-}
+# perGenePerPositionMutationRates <- function(data){
+#   gene_mut_pos <- perGenePerPositionMutationRates(data)
+#   stats <- getCoreStats(gene_mut_pos)
+#   plotStats(gene_mut_pos,stats,"Histogram of gene mutation rates , per position", "Mutation Rate Value per Position")
+#   print(kable(stats))
+# }
 # Creates a plot and statistics from the output data of the sumrep function :
 # getHotspotCountDistribution()
 # @param data repertoire data file in data.table format
@@ -178,149 +294,149 @@ coldspotCountDist <- function(data){
 # getPolarityDistribution()
 # @param data repertoire data file in data.table format
 
-polarityDistribution <- function(data){
-  polarity <- getPolarityDistribution(data)
-  stats <- getCoreStats(polarity)
-  plotStats(polarity,stats,"Histogram of polarity distribution", "Polarity Value")
-  print(kable(stats))
-}
-# Creates a plot and statistics from the output data of the sumrep function :
-# getChargeDistribution()
-# @param data repertoire data file in data.table format
-
-chargeDistribution <- function(data){
-  charge <- getChargeDistribution(data)
-  stats <- getCoreStats(charge)
-  plotStats(charge,stats,"Histogram of charge distribution", "Charge Value")
-  print(kable(stats))
-}
-# Creates a plot and statistics from the output data of the sumrep function :
-# getBasicityDistribution()
-# @param data repertoire data file in data.table format
-
-basicityDistribution <- function(data){
-  basicity <- getBasicityDistribution(data)
-  stats <- getCoreStats(basicity)
-  plotStats(basicity,stats,"Histogram of basicity distribution", "Basicity Value")
-  print(kable(stats))
-}
-# Creates a plot and statistics from the output data of the sumrep function :
-# getAcidityDistribution()
-# @param data repertoire data file in data.table format
-
-acidityDistribution <- function(data){
-  acidity <- getAcidityDistribution(data)
-  stats <- getCoreStats(acidity)
-  plotStats(acidity,stats,"Histogram of acidity distribution", "Acidity Value")
-  print(kable(stats))
-}
-# Creates a plot and statistics from the output data of the sumrep function :
-# getAromaticityDistribution()
-# @param data repertoire data file in data.table format
-
-aromaticityDistribution <- function(data){
-  aromaticity <- getAromaticityDistribution(data)
-  stats <- getCoreStats(aromaticity)
-  plotStats(aromaticity,stats,"Histogram of aromaticity distribution", "Aromaticity Value")
-  print(kable(stats))
-}
-# Creates a plot and statistics from the output data of the sumrep function :
-# getBulkinessDistribution()
-# @param data repertoire data file in data.table format
-
-bulkinessDistribution <- function(data){
-  bulkiness <- getBulkinessDistribution(data)
-  stats <- getCoreStats(bulkiness)
-  plotStats(bulkiness,stats,"Histogram of bulkiness distribution", "Bulkiness Value")
-  print(kable(stats))
-}
-# Creates a plot and statistics from the output data of the sumrep function :
-# getVDInsertionLengthDistribution()
-# @param data repertoire data file in data.table format
+# polarityDistribution <- function(data){
+#   polarity <- getPolarityDistribution(data)
+#   stats <- getCoreStats(polarity)
+#   plotStats(polarity,stats,"Histogram of polarity distribution", "Polarity Value")
+#   print(kable(stats))
+# }
+# # Creates a plot and statistics from the output data of the sumrep function :
+# # getChargeDistribution()
+# # @param data repertoire data file in data.table format
 # 
-VDinsertionLengthDistribution<- function(data){
-  VDinst <- getVDInsertionLengthDistribution(data)
-  stats <- getCoreStats(VDinst)
-  plotStats(VDinst,stats,"Histogram of VD Insertion distribution", "VD Insertion Value")
-  print(kable(stats))
-}
-# Creates a plot and statistics from the output data of the sumrep function :
-# getDJInsertionLengthDistribution()
-# @param data repertoire data file in data.table format
+# chargeDistribution <- function(data){
+#   charge <- getChargeDistribution(data)
+#   stats <- getCoreStats(charge)
+#   plotStats(charge,stats,"Histogram of charge distribution", "Charge Value")
+#   print(kable(stats))
+# }
+# # Creates a plot and statistics from the output data of the sumrep function :
+# # getBasicityDistribution()
+# # @param data repertoire data file in data.table format
 # 
-DJinsertionLengthDistribution<- function(data){
-  DJinst <- getDJInsertionLengthDistribution(data)
-  stats <- getCoreStats(DJinst)
-  plotStats(DJinst,stats,"Histogram of DJ Insertion distribution", "DJ Insertion Value")
-  print(kable(stats))
-}
-# Creates a plot and statistics from the output data of the sumrep function :
-# getVJInsertionLengthDistribution()
-# @param data repertoire data file in data.table format
+# basicityDistribution <- function(data){
+#   basicity <- getBasicityDistribution(data)
+#   stats <- getCoreStats(basicity)
+#   plotStats(basicity,stats,"Histogram of basicity distribution", "Basicity Value")
+#   print(kable(stats))
+# }
+# # Creates a plot and statistics from the output data of the sumrep function :
+# # getAcidityDistribution()
+# # @param data repertoire data file in data.table format
 # 
-VJinsertionLengthDistribution<- function(data){
-  VJinst <- getVJInsertionLengthDistribution(data)
-  stats <- getCoreStats(VJinst)
-  plotStats(VJinst,stats,"Histogram of VJ Insertion distribution", "VJ Insertion Value")
-  print(kable(stats))
-}
-# Creates a plot and statistics from the output data of the sumrep function :
-# getVGene3PrimeDeletionLengthDistribution()
-# @param data repertoire data file in data.table format
-
-VGene3PrimeDeletionLengthDistribution <- function(data){
-  v3prime <- getVGene3PrimeDeletionLengthDistribution(data)
-  stats <- getCoreStats(v3prime)
-  plotStats(v3prime,stats,"Histogram of V Gene 3 prime deletion lengths distribution", "Deletion length Value")
-  print(kable(stats))
-}
-# Creates a plot and statistics from the output data of the sumrep function :
-# getVGene5PrimeDeletionLengthDistribution()
-# @param data repertoire data file in data.table format
-
-VGene5PrimeDeletionLengthDistribution <- function(data){
-  v5prime <- getVGene5PrimeDeletionLengthDistribution(data)
-  stats <- getCoreStats(v5prime)
-  plotStats(v5prime,stats,"Histogram of V Gene 5 prime deletion lengths distribution", "Deletion length Value")
-  print(kable(stats))
-}
-# Creates a plot and statistics from the output data of the sumrep function :
-# getDGene3PrimeDeletionLengthDistribution()
-# @param data repertoire data file in data.table format
-
-DGene3PrimeDeletionLengthDistribution <- function(data){
-  d3prime <- getDGene3PrimeDeletionLengthDistribution(data)
-  stats <- getCoreStats(d3prime)
-  plotStats(d3prime,stats,"Histogram of D Gene 3 prime deletion lengths distribution", "Deletion length Value")
-  print(kable(stats))
-}
-# Creates a plot and statistics from the output data of the sumrep function :
-# getDGene5PrimeDeletionLengthDistribution()
-# @param data repertoire data file in data.table format
-
-DGene5PrimeDeletionLengthDistribution <- function(data){
-  d5prime <- getDGene5PrimeDeletionLengthDistribution(data)
-  stats <- getCoreStats(d5prime)
-  plotStats(d5prime,stats,"Histogram of D Gene 5 prime deletion lengths distribution", "Deletion length Value")
-  print(kable(stats))
-}
-# Creates a plot and statistics from the output data of the sumrep function :
-# getJGene3PrimeDeletionLengthDistribution()
-# @param data repertoire data file in data.table format
-
-JGene3PrimeDeletionLengthDistribution <- function(data){
-  j3prime <- getJGene3PrimeDeletionLengthDistribution(data)
-  stats <- getCoreStats(j3prime)
-  plotStats(j3prime,stats,"Histogram of J Gene 3 prime deletion lengths distribution", "Deletion length Value")
-  print(kable(stats))
-}
-# Creates a plot and statistics from the output data of the sumrep function :
-# getJGene5PrimeDeletionLengthDistribution()
-# @param data repertoire data file in data.table format
-
-JGene5PrimeDeletionLengthDistribution <- function(data){
-  j5prime <- getJGene5PrimeDeletionLengthDistribution(data)
-  stats <- getCoreStats(j5prime)
-  plotStats(j5prime,stats,"Histogram of J Gene 5 prime deletion lengths distribution", "Deletion length Value")
-  print(kable(stats))
-}
+# acidityDistribution <- function(data){
+#   acidity <- getAcidityDistribution(data)
+#   stats <- getCoreStats(acidity)
+#   plotStats(acidity,stats,"Histogram of acidity distribution", "Acidity Value")
+#   print(kable(stats))
+# }
+# # Creates a plot and statistics from the output data of the sumrep function :
+# # getAromaticityDistribution()
+# # @param data repertoire data file in data.table format
+# 
+# aromaticityDistribution <- function(data){
+#   aromaticity <- getAromaticityDistribution(data)
+#   stats <- getCoreStats(aromaticity)
+#   plotStats(aromaticity,stats,"Histogram of aromaticity distribution", "Aromaticity Value")
+#   print(kable(stats))
+# }
+# # Creates a plot and statistics from the output data of the sumrep function :
+# # getBulkinessDistribution()
+# # @param data repertoire data file in data.table format
+# 
+# bulkinessDistribution <- function(data){
+#   bulkiness <- getBulkinessDistribution(data)
+#   stats <- getCoreStats(bulkiness)
+#   plotStats(bulkiness,stats,"Histogram of bulkiness distribution", "Bulkiness Value")
+#   print(kable(stats))
+# }
+# # Creates a plot and statistics from the output data of the sumrep function :
+# # getVDInsertionLengthDistribution()
+# # @param data repertoire data file in data.table format
+# # 
+# VDinsertionLengthDistribution<- function(data){
+#   VDinst <- getVDInsertionLengthDistribution(data)
+#   stats <- getCoreStats(VDinst)
+#   plotStats(VDinst,stats,"Histogram of VD Insertion distribution", "VD Insertion Value")
+#   print(kable(stats))
+# }
+# # Creates a plot and statistics from the output data of the sumrep function :
+# # getDJInsertionLengthDistribution()
+# # @param data repertoire data file in data.table format
+# # 
+# DJinsertionLengthDistribution<- function(data){
+#   DJinst <- getDJInsertionLengthDistribution(data)
+#   stats <- getCoreStats(DJinst)
+#   plotStats(DJinst,stats,"Histogram of DJ Insertion distribution", "DJ Insertion Value")
+#   print(kable(stats))
+# }
+# # Creates a plot and statistics from the output data of the sumrep function :
+# # getVJInsertionLengthDistribution()
+# # @param data repertoire data file in data.table format
+# # 
+# VJinsertionLengthDistribution<- function(data){
+#   VJinst <- getVJInsertionLengthDistribution(data)
+#   stats <- getCoreStats(VJinst)
+#   plotStats(VJinst,stats,"Histogram of VJ Insertion distribution", "VJ Insertion Value")
+#   print(kable(stats))
+# }
+# # Creates a plot and statistics from the output data of the sumrep function :
+# # getVGene3PrimeDeletionLengthDistribution()
+# # @param data repertoire data file in data.table format
+# 
+# VGene3PrimeDeletionLengthDistribution <- function(data){
+#   v3prime <- getVGene3PrimeDeletionLengthDistribution(data)
+#   stats <- getCoreStats(v3prime)
+#   plotStats(v3prime,stats,"Histogram of V Gene 3 prime deletion lengths distribution", "Deletion length Value")
+#   print(kable(stats))
+# }
+# # Creates a plot and statistics from the output data of the sumrep function :
+# # getVGene5PrimeDeletionLengthDistribution()
+# # @param data repertoire data file in data.table format
+# 
+# VGene5PrimeDeletionLengthDistribution <- function(data){
+#   v5prime <- getVGene5PrimeDeletionLengthDistribution(data)
+#   stats <- getCoreStats(v5prime)
+#   plotStats(v5prime,stats,"Histogram of V Gene 5 prime deletion lengths distribution", "Deletion length Value")
+#   print(kable(stats))
+# }
+# # Creates a plot and statistics from the output data of the sumrep function :
+# # getDGene3PrimeDeletionLengthDistribution()
+# # @param data repertoire data file in data.table format
+# 
+# DGene3PrimeDeletionLengthDistribution <- function(data){
+#   d3prime <- getDGene3PrimeDeletionLengthDistribution(data)
+#   stats <- getCoreStats(d3prime)
+#   plotStats(d3prime,stats,"Histogram of D Gene 3 prime deletion lengths distribution", "Deletion length Value")
+#   print(kable(stats))
+# }
+# # Creates a plot and statistics from the output data of the sumrep function :
+# # getDGene5PrimeDeletionLengthDistribution()
+# # @param data repertoire data file in data.table format
+# 
+# DGene5PrimeDeletionLengthDistribution <- function(data){
+#   d5prime <- getDGene5PrimeDeletionLengthDistribution(data)
+#   stats <- getCoreStats(d5prime)
+#   plotStats(d5prime,stats,"Histogram of D Gene 5 prime deletion lengths distribution", "Deletion length Value")
+#   print(kable(stats))
+# }
+# # Creates a plot and statistics from the output data of the sumrep function :
+# # getJGene3PrimeDeletionLengthDistribution()
+# # @param data repertoire data file in data.table format
+# 
+# JGene3PrimeDeletionLengthDistribution <- function(data){
+#   j3prime <- getJGene3PrimeDeletionLengthDistribution(data)
+#   stats <- getCoreStats(j3prime)
+#   plotStats(j3prime,stats,"Histogram of J Gene 3 prime deletion lengths distribution", "Deletion length Value")
+#   print(kable(stats))
+# }
+# # Creates a plot and statistics from the output data of the sumrep function :
+# # getJGene5PrimeDeletionLengthDistribution()
+# # @param data repertoire data file in data.table format
+# 
+# JGene5PrimeDeletionLengthDistribution <- function(data){
+#   j5prime <- getJGene5PrimeDeletionLengthDistribution(data)
+#   stats <- getCoreStats(j5prime)
+#   plotStats(j5prime,stats,"Histogram of J Gene 5 prime deletion lengths distribution", "Deletion length Value")
+#   print(kable(stats))
+# }

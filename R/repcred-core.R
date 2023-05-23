@@ -1,13 +1,8 @@
-#' @include repcred.R
-NULL
-
-#' Shiny application
-#' 
-#' The function start the shiny application to generate the repcred report
-#' 
-#' @param  appDir   the path for the repcred package shiny application
-#' @param  port     the port for running the app
-#' @param ...       `dynamic-dots` rlang::dyn-dots
+#' Start the shiny app 
+#' @param appDir   The location of the repcred app
+#' @param port     On which port to run the app on. Default 3838
+#' @param launch.browser If to launch the browser. See shiny `runApp` for details. Default True.
+#' @param ... Additional arguments passed on to methods.
 #' @export
 repcredWeb <- function(appDir=system.file("shiny-app", 
                                           package = "repcred"), 
@@ -21,18 +16,22 @@ repcredWeb <- function(appDir=system.file("shiny-app",
 
 #' Generate Repertoire Credibility report
 #' 
-#' This function reads the repertoire file specified by \code{rep}
+#' This funcion reads the repertoire file specified by \code{rep}
 #' and runs a set of sets to evaluate the credibility of the repertoire.
 #' 
-#' @param  rep Path to the repertoire file.
-#' @param downsample Whether report will downsample repertoire
-#' @param genome_file reference file path.
-#' @param outdir     If path location supplied save the report and the params
-#' @param sumrep     If to run a full sumrep report
+#' @param rep         Path to the repertoire file.
+#' @param downsample  Whether report will downsample repertoire
+#' @param genome_file A reference set of the V(D)J alleles.
+#' @param outdir      Directory where the report will be generated
 #' @return Path to the credibility report. 
 #' 
+#' @examples
+#' 
+#' rep_file <- system.file(package="repcred", "extdata", "ExampleDb.tsv")
+#' repcred_report(rep_file, tempdir())
 #' @export
-repcred_report <- function(rep, outdir=NULL,genome_file,sumrep, downsample=TRUE) {
+repcred_report <- function(rep, outdir=NULL,genome_file=NA, downsample=TRUE) {
+    
     if (file.exists(rep)) {
         if (is.null(outdir)) {
             outdir <- dirname(rep)
@@ -43,7 +42,7 @@ repcred_report <- function(rep, outdir=NULL,genome_file,sumrep, downsample=TRUE)
     
     tryCatch(
         {
-            report_path <- render_report(rep, outdir,genome_file,sumrep,downsample)
+            report_path <- render_report(rep, outdir,genome_file,downsample)
         },
         error = function(e) {
             stop(safeError(e))
@@ -93,14 +92,13 @@ getCoreStats <- function(data){
     return(vals)
 }
 
-# Render credibility report
-# 
-# @param rep Path to repertoire 
-# @param outdir Directory where the report will be generated
-# @param downsample Whether report will downsample repertoire
-# @param sumrep    Whether to run a sumrep statistics
-# @param genome    A sequence reference fasta file
-render_report <- function(rep,outdir,genome,sumrep,downsample) {
+#' Render credibility report
+#' 
+#' @param rep Path to repertoire 
+#' @param outdir Directory where the report will be generated
+#' @param downsample Whether report will downsample repertoire
+#' @param genome  A reference set of the V(D)J alleles.
+render_report <- function(rep,outdir,genome=NA,downsample) {
     path = "../rstudio/templates/project/project_files/"
     if (!dir.exists(outdir)) {
         dir.create(outdir, recursive = T)
@@ -121,21 +119,22 @@ render_report <- function(rep,outdir,genome,sumrep,downsample) {
             output_format='bookdown::gitbook',
             config_file ="_bookdown.yml",
             clean=FALSE,
-            new_session=FALSE, clean_envir=FALSE,
-            params=list("rep"=rep, outdir=outdir,"genome_file"=genome,full_or_basic=sumrep,
+            new_session=FALSE,
+            params=list("rep"=rep, outdir=outdir,"genome_file"=genome,
                         "downsample"=downsample))
     )
     book
 }
 
 
-# Create a Repertoire Credibility Project
-# 
-# From RStudio, use the New Project wizard: File > New Project >
-# New Directory > then select  Repertoire Credibility Project
-# to create the skeleton of a Repertoire Credibility Project
-# @param  path path to the directorye where the project will be created
-repcred_project <- function(path) {
+#' Create a Repertoire Credibility Project
+#' 
+#' From RStudio, use the New Project wizard: File > New Project >
+#' New Directory > then select  Repertoire Credibility Project
+#' to create the skeleton of a Repertoire Credibility Project
+#' @param  path path to the directorye where the project will be created
+#' @param ... Additional arguments passed on to methods.
+repcred_project <- function(path,...) {
     skeleton_dir <- file.path(system.file(package="repcred"),"rstudio", "templates", "project", "project_files")
     project_dir <- path
     dir.create(project_dir, recursive = TRUE, showWarnings = FALSE)

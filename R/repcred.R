@@ -18,7 +18,6 @@
 #' @import      ggplot2
 #' @import      stringr
 #' @import      dplyr
-#' @import      sumrep
 #' @import      shiny
 #' @import      rmarkdown
 #' @import      knitr
@@ -27,12 +26,13 @@
 #' @import      tidyr
 #' @import      xfun
 #' @importFrom  airr        read_rearrangement write_rearrangement validate_airr
-#' @importFrom  Biostrings  reverseComplement DNAString pairwiseAlignment nucleotideSubstitutionMatrix
 #' @importFrom  ggpubr      theme_pubclean
 #' @importFrom  kableExtra  kbl
+#' @importFrom  Biostrings  reverseComplement DNAString pairwiseAlignment nucleotideSubstitutionMatrix vcountPattern DNAStringSet
 #' @importFrom  knitr       kable 
 #' @importFrom  data.table  as.data.table data.table .SD
 #' @importFrom  graphics    barplot abline arrows barplot hist
 #' @importFrom  stats       na.omit quantile sd start runif
 #' @importFrom  utils       head
+#' @importFrom  ape         as.DNAbin GC.content
 NULL
