@@ -40,5 +40,5 @@ jobs:
           file: ./docker/Dockerfile
           push: true
           no-cache: true
-          tags: $airrc/rep-cred:latest
+          tags: airrc/rep-cred:latest
           
