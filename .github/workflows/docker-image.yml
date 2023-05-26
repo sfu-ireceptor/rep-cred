@@ -24,16 +24,20 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          context: ./docker
+          file: ./docker/Dockerfile
       - name: Build and export to Docker
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./docker
+          file: ./docker/Dockerfile
           load: true
           tags: rep-cred:test
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./docker
+          file: ./docker/Dockerfile
           push: true
           no-cache: true
           tags: $airrc/rep-cred:latest
