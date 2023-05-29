@@ -25,20 +25,20 @@ devtools::install_github('airr-community/rep-cred')
 Pull the container:
 
 ```
-docker pull ssnn/repcred:devel
+docker pull airrc/rep-cred:latest
 ```
 
 To launch the shiny application use the command below. Then open in your browser
 ` http://localhost:3838`.
 
 ```
-docker run --rm --network host -ti --user shiny -p 3838:3838 ssnn/repcred:devel
+docker run --rm --network host -ti --user shiny -p 3838:3838 airrc/rep-cred:latest
 ```
 
 To open a terminal inside the container use:
 
 ```
-docker run --rm --network host -ti --user shiny -p 3838:3838 ssnn/repcred:devel bash
+docker run --rm --network host -ti --user shiny -p 3838:3838 airrc/rep-cred:latest bash
 ```
 
 
