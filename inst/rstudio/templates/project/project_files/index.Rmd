@@ -50,7 +50,7 @@ save(params, file = file.path(params$outdir, "params.RData"))
 # Load libraries
 library(repcred)
 library(airr)
-library(sumrep)
+# library(sumrep)
 library(stringr)
 library(ggplot2)
 library(data.table)
