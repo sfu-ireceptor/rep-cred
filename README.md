@@ -29,16 +29,16 @@ docker pull airrc/rep-cred:latest
 ```
 
 To launch the shiny application use the command below. Then open in your browser
-` http://localhost:3838`.
+` http://localhost:3838`. 
 
 ```
-docker run --rm --network host -ti --user shiny -p 3838:3838 airrc/rep-cred:latest
+docker run --rm -ti --user shiny -p 3838:3838 airrc/rep-cred:latest
 ```
 
 To open a terminal inside the container use:
 
 ```
-docker run --rm --network host -ti --user shiny -p 3838:3838 airrc/rep-cred:latest bash
+docker run --rm --user shiny -p 3838:3838 airrc/rep-cred:latest bash
 ```
 
 
