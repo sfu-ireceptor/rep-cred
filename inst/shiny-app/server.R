@@ -46,7 +46,7 @@ server <- function(input, output) {
             {
                dataValues$repcred_report_path <- repcred_report(input$file1$datapath,
                                                                 genome_file=input$genome$datapath,
-                                                                sumrep = input$sumrep,
+                                                                #sumrep = input$sumrep,
                                                                 downsample = input$input_downsample)
                
             },

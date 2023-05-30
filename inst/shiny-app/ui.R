@@ -25,7 +25,7 @@ ui <- fluidPage(
             checkboxInput("input_chk", "Upload germline reference set?", value = FALSE ),
             uiOutput("condInput"),
             
-            selectInput("sumrep" , "Select Sumrep stats to run. Full stats takes longer to run but gives pairwise statistics , Basic statistics is faster but contains less statistics." , choices=c("Full sumrep stats" , "Basic sumrep stats")),
+            #selectInput("sumrep" , "Select Sumrep stats to run. Full stats takes longer to run but gives pairwise statistics , Basic statistics is faster but contains less statistics." , choices=c("Full sumrep stats" , "Basic sumrep stats")),
           
             
             
