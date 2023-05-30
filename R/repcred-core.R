@@ -10,7 +10,7 @@ repcredWeb <- function(appDir=system.file("shiny-app",
     if (appDir == "") {
         stop("Could not find app dir.", call. = FALSE)
     }
-    shiny::runApp(appDir, port=port, display.mode = "normal", launch.browser = launch.browser,...)
+    shiny::runApp(appDir, port=port, host = "0.0.0.0", display.mode = "normal", launch.browser = launch.browser,...)
 }
 
 
