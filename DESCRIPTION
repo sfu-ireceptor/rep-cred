@@ -29,6 +29,7 @@ Imports:
     ggpubr,
     kableExtra,
     knitr,
+    optparse,
     rmarkdown,
     stringr,
     stringi,
@@ -36,7 +37,6 @@ Imports:
     xfun,
 Suggests:
     testthat
-RoxygenNote: 7.2.3
 Collate:
     'repcred-package.R'
     'cdr3_check.R'
@@ -45,3 +45,4 @@ Collate:
     'report-functions.R'
     'sumrep_stats.R'
     'ui_edit.R'
+RoxygenNote: 7.2.3

@@ -20,7 +20,7 @@ devtools::install_github('airr-community/rep-cred')
 
 # Running Repcred
 
-## Docker
+## Docker - GUI
 
 Pull the container:
 
@@ -41,8 +41,28 @@ To open a terminal inside the container use:
 docker run --rm --user shiny -p 3838:3838 airrc/rep-cred:latest bash
 ```
 
+## Docker - command line
 
-## Local installation
+Pull the container:
+
+```
+docker pull airrc/rep-cred:latest
+```
+
+Get example data:
+
+```
+wget https://raw.githubusercontent.com/airr-community/rep-cred/master/inst/extdata/ExampleDb.tsv
+```
+
+Run `repcred`:
+
+```
+docker run --rm -v $(pwd):/home:z airrc/rep-cred:latest repcred -r ExampleDb.tsv -o repcred-report
+```
+
+
+## Local - GUI
 
 Repcred can be started from an R prompt as follows:
 
