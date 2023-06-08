@@ -35,6 +35,12 @@ To launch the shiny application use the command below. Then open in your browser
 docker run --rm -ti --user shiny -p 3838:3838 airrc/rep-cred:latest
 ```
 
+If you are using linux, you may need to use the command line
+
+```
+docker run --rm --network host -ti --user shiny -p 3838:3838 airrc/rep-cred:latest
+```
+
 To open a terminal inside the container use:
 
 ```
