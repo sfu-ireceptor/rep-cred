@@ -4,19 +4,6 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)]()
 [![Build Status](https://travis-ci.org/airr-community/rep-cred.svg?branch=master)](https://travis-ci.org/airr-community/rep-cred)
 
 
-# Installation
-
-## Pre-requisites
-
-Repcred requires a recent version of [pandoc](https://pandoc.org). This is installed with Rstudio and the easiest approach is to check that you are using a recent version, although other installation methods are described in the [documentation](https://bookdown.org/yihui/rmarkdown-cookbook/install-pandoc.html).
- 
-## Installing Repcred
-
-Repdred can be installed from github:
-
-```
-devtools::install_github('airr-community/rep-cred')
-```
 
 # Running Repcred
 
@@ -67,8 +54,21 @@ Run `repcred`:
 docker run --rm -v $(pwd):/home:z airrc/rep-cred:latest repcred -r ExampleDb.tsv -o repcred-report
 ```
 
+## Local Installation
 
-## Local - GUI
+## Pre-requisites
+
+Repcred requires a recent version of [pandoc](https://pandoc.org). This is installed with Rstudio and the easiest approach is to check that you are using a recent version, although other installation methods are described in the [documentation](https://bookdown.org/yihui/rmarkdown-cookbook/install-pandoc.html).
+ 
+## Installing Repcred
+
+Repdred can be installed from github:
+
+```
+devtools::install_github('airr-community/rep-cred')
+```
+
+## Running Repcred
 
 Repcred can be started from an R prompt as follows:
 
