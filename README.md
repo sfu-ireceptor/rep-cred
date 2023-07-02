@@ -4,7 +4,57 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)]()
 [![Build Status](https://travis-ci.org/airr-community/rep-cred.svg?branch=master)](https://travis-ci.org/airr-community/rep-cred)
 
 
-# Installation
+
+# Running Repcred
+
+## Docker - GUI
+
+Pull the container:
+
+```
+docker pull airrc/rep-cred:latest
+```
+
+To launch the shiny application use the command below. Then open in your browser
+` http://localhost:3838`. 
+
+```
+docker run --rm -ti --user shiny -p 3838:3838 airrc/rep-cred:latest
+```
+
+If you are using linux, you may need to use the command line
+
+```
+docker run --rm --network host -ti --user shiny -p 3838:3838 airrc/rep-cred:latest
+```
+
+To open a terminal inside the container use:
+
+```
+docker run --rm --user shiny -p 3838:3838 airrc/rep-cred:latest bash
+```
+
+## Docker - command line
+
+Pull the container:
+
+```
+docker pull airrc/rep-cred:latest
+```
+
+Get example data:
+
+```
+wget https://raw.githubusercontent.com/airr-community/rep-cred/master/inst/extdata/ExampleDb.tsv
+```
+
+Run `repcred`:
+
+```
+docker run --rm -v $(pwd):/home:z airrc/rep-cred:latest repcred -r ExampleDb.tsv -o repcred-report
+```
+
+## Local Installation
 
 ## Pre-requisites
 
@@ -18,31 +68,7 @@ Repdred can be installed from github:
 devtools::install_github('airr-community/rep-cred')
 ```
 
-# Running Repcred
-
-## Docker
-
-Pull the container:
-
-```
-docker pull airrc/rep-cred:latest
-```
-
-To launch the shiny application use the command below. Then open in your browser
-` http://localhost:3838`.
-
-```
-docker run --rm --network host -ti --user shiny -p 3838:3838 airrc/rep-cred:latest
-```
-
-To open a terminal inside the container use:
-
-```
-docker run --rm --network host -ti --user shiny -p 3838:3838 airrc/rep-cred:latest bash
-```
-
-
-## Local installation
+## Running Repcred
 
 Repcred can be started from an R prompt as follows:
 

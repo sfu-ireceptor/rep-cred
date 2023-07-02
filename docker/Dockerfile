@@ -27,4 +27,8 @@ RUN Rscript -e "BiocManager::install(c('Biostrings', 'GenomicAlignments', 'IRang
 #RUN Rscript -e "devtools::install_github('LuciaRotger/CollessLike', ref='master', dependencies=TRUE)"
 #RUN Rscript -e "devtools::install_github('matsengrp/sumrep', ref='master', dependencies=TRUE)"
 RUN Rscript -e "devtools::install_github('airr-community/rep-cred', ref='master', dependencies=TRUE)"
+#RUN Rscript -e "p<-Sys.getenv('PATH');Sys.setenv(PATH = paste(p, dirname(system.file('repcred.R', package='repcred')), sep = ':'))"
+RUN Rscript -e "repcred<-system.file('repcred.R', package='repcred');file.copy(repcred,'/usr/local/bin/repcred')" \
+    && chmod +x /usr/local/bin/repcred
+WORKDIR /home
 CMD Rscript -e "repcred::repcredWeb(launch.browser = F)"

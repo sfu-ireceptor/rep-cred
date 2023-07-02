@@ -10,7 +10,7 @@ repcredWeb <- function(appDir=system.file("shiny-app",
     if (appDir == "") {
         stop("Could not find app dir.", call. = FALSE)
     }
-    shiny::runApp(appDir, port=port, display.mode = "normal", launch.browser = launch.browser,...)
+    shiny::runApp(appDir, port=port, host = "0.0.0.0", display.mode = "normal", quiet=TRUE, launch.browser = launch.browser,...)
 }
 
 
@@ -98,6 +98,7 @@ getCoreStats <- function(data){
 #' @param outdir Directory where the report will be generated
 #' @param downsample Whether report will downsample repertoire
 #' @param genome  A reference set of the V(D)J alleles.
+#' @export
 render_report <- function(rep,outdir,genome=NULL,downsample) {
     path = "../rstudio/templates/project/project_files/"
     if (!dir.exists(outdir)) {
