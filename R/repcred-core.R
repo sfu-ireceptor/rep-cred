@@ -30,7 +30,7 @@ repcredWeb <- function(appDir=system.file("shiny-app",
 #' rep_file <- system.file(package="repcred", "extdata", "ExampleDb.tsv")
 #' repcred_report(rep_file, tempdir())
 #' @export
-repcred_report <- function(rep, outdir=NULL,genome_file=NA, downsample=TRUE) {
+repcred_report <- function(rep, outdir=NULL,genome_file=NULL, downsample=TRUE) {
     
     if (file.exists(rep)) {
         if (is.null(outdir)) {
@@ -98,7 +98,7 @@ getCoreStats <- function(data){
 #' @param outdir Directory where the report will be generated
 #' @param downsample Whether report will downsample repertoire
 #' @param genome  A reference set of the V(D)J alleles.
-render_report <- function(rep,outdir,genome=NA,downsample) {
+render_report <- function(rep,outdir,genome=NULL,downsample) {
     path = "../rstudio/templates/project/project_files/"
     if (!dir.exists(outdir)) {
         dir.create(outdir, recursive = T)

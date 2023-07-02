@@ -27,7 +27,7 @@ params:
    cache: FALSE
    rep:  !r system.file("extdata", "P4_I4.tsv", package = "repcred")
    outdir: !r tempdir()
-   genome_file: !r NA
+   genome_file: !r NULL
    full_or_basic: !r FALSE
    downsample: !r TRUE
 ---
@@ -50,7 +50,6 @@ save(params, file = file.path(params$outdir, "params.RData"))
 # Load libraries
 library(repcred)
 library(airr)
-# library(sumrep)
 library(stringr)
 library(ggplot2)
 library(data.table)
@@ -70,19 +69,18 @@ params
 
 ```{r input-parameters}
 #SECTION 1
-if (is.na(params$genome_file)) {
-  germline_reference = NULL
-} else{
+germline_reference <- NULL
+if (!is.null(params$genome_file)) {
   germline_reference <-
     tigger::readIgFasta(params$genome_file)
-}
+} 
 
 if (params$full_or_basic == "Full sumrep stats") {
   full_check = TRUE
 } else{
   full_check = FALSE
 }
-params
+print(params)
 ```
 
 
@@ -244,7 +242,7 @@ ggplot2::ggplot(
   ggplot2::facet_grid(cols = ggplot2::vars(!! ggplot2::sym("region")))
   
 
-length_info %>% dplyr::group_by(!!as.name("region")) %>%
+length_info <- length_info %>% dplyr::group_by(!!as.name("region")) %>%
   dplyr::summarise(
     Min = min(!!as.name("lengths"), na.rm = T),
     Max = max(!!as.name("lengths"), na.rm = T),
@@ -616,7 +614,7 @@ ggplot(freq_table,aes(x=Var2,y=Freq,fill=Var1))+geom_bar(stat="identity")+guides
 
 Below contain CDR3 sequences with more than one v_call:
 
-```{r warning = TRUE, results="asis" } 
+```{r warning = TRUE} 
 options(width = 2000)
 num_to_display=0
 if(length(repertoire$sequence)>100000){
@@ -628,7 +626,10 @@ if(length(repertoire$sequence)>100000){
 # if(seq_type == "")
 # display_type
 if (full_check == TRUE){
-plotVgeneDist(cdr3_vcalls,num_to_display, "aa",multiple_vgene_freq)}
+plotVgeneDist(cdr3_vcalls,num_to_display, "aa",multiple_vgene_freq)
+}else{
+  writeLines("Only Basic stats were run , if you would like to get stats of possible chimeric sequences please run full stats.")
+}
 #kbl(most_chimeric)
 ```
 
