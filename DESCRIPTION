@@ -33,6 +33,7 @@ Imports:
     rmarkdown,
     stringr,
     stringi,
+	tigger,
     tidyr,
     xfun,
 Suggests:
