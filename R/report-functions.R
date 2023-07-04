@@ -191,7 +191,8 @@ getGeneAlleleStat <- function(repertoire, reference = NULL, call="v_call") {
     dplyr::mutate("proportion" = 1/(stringi::stri_count(!!as.name("proportion"),regex = ",")+1)) %>%
     dplyr::group_by(!!as.name("gene")) %>%
     dplyr::summarise("frequency" = sum(!!as.name("proportion")),
-                     "unique_alleles" = paste0(unique(grep(unique(!!as.name("gene")),unlist(strsplit(!!as.name(call),",")), value = T)), collapse = ","),
+                     "unique_alleles" = paste0(unique(grep(unique(!!as.name("gene")),unlist(strsplit(!!as.name(call),",")), value = T)), 
+                                               collapse = ","),
                      "count_unique_alleles" = stringi::stri_count(!!as.name("unique_alleles"),regex = ",")+1)
   
   if(!is.null(reference)){
@@ -209,10 +210,10 @@ getGeneAlleleStat <- function(repertoire, reference = NULL, call="v_call") {
     mis_alleles <- alleles[!alleles %in% allele_data$allele]
     mis_gene <- genes[!genes %in% gene_data$gene]
     
-    allele_data <- rbind(allele_data, data.frame("allele" = mis_alleles,
+    allele_data <- bind_rows(allele_data, data.frame("allele" = mis_alleles,
                                                  "frequency" = 0,
                                                  "in_ref" = F))
-    gene_data <- rbind(gene_data, data.frame("gene" = mis_gene,
+    gene_data <- bind_rows(gene_data, data.frame("gene" = mis_gene,
                                                  "frequency" = 0,
                                                  "in_ref" = F))
   }
