@@ -30,7 +30,7 @@ ui <- fluidPage(
             
             
           
-           actionButton("go", "Test Repertoire"),
+           actionButton("go", "Run analysis"),
              
             # Output
             uiOutput("openResultsBtn")

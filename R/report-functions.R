@@ -197,25 +197,42 @@ getGeneAlleleStat <- function(repertoire, reference = NULL, call="v_call") {
   
   if(!is.null(reference)){
     
-    alleles <- names(reference)
-    genes <- alakazam::getGene(names(reference), first = F, collapse = T, 
-                               strip_d = F, omit_nl = F)
+    call_region <- substr(gene_data$gene[1],1,4)
     
-    ## check if allele/gene is in ref
+    alleles <- grep(call_region, names(reference), value=T)
     
-    allele_data$in_ref <- allele_data$allele %in% alleles
-    gene_data$in_ref <- gene_data$gene %in% genes
-    
-    ## add missing alleles and genes for later statistics
-    mis_alleles <- alleles[!alleles %in% allele_data$allele]
-    mis_gene <- genes[!genes %in% gene_data$gene]
-    
-    allele_data <- bind_rows(allele_data, data.frame("allele" = mis_alleles,
-                                                 "frequency" = 0,
-                                                 "in_ref" = F))
-    gene_data <- bind_rows(gene_data, data.frame("gene" = mis_gene,
-                                                 "frequency" = 0,
-                                                 "in_ref" = F))
+    if(length(alleles)!=0){
+      genes <- alakazam::getGene(alleles, first = F, collapse = T, 
+                                 strip_d = F, omit_nl = F)
+      
+      ## check if allele/gene is in ref
+      
+      allele_data$in_ref <- allele_data$allele %in% alleles
+      gene_data$in_ref <- gene_data$gene %in% genes
+      allele_data$in_rep <- TRUE
+      gene_data$in_rep <- TRUE
+      
+      if(any(!allele_data$in_ref)){
+        print(paste0("The following alleles were not found in the reference set: ", paste0(
+          allele_data$allele[!allele_data$in_ref], collapse = ","
+        )))
+      }
+      
+      ## add missing alleles and genes for later statistics
+      mis_alleles <- alleles[!alleles %in% allele_data$allele]
+      mis_gene <- genes[!genes %in% gene_data$gene]
+      
+      if(length(mis_alleles)!=0) allele_data <- bind_rows(allele_data, data.frame("allele" = mis_alleles,
+                                                   "frequency" = 0,
+                                                   "in_ref" = TRUE,
+                                                   "in_rep" = FALSE))
+      if(length(mis_gene)!=0) gene_data <- bind_rows(gene_data, data.frame("gene" = mis_gene,
+                                                   "frequency" = 0,
+                                                   "in_ref" = TRUE,
+                                                   "in_rep" = FALSE))
+    }else{
+      print(paste0("The reference set supplied does not include alleles from the ", call_region, " call region"))
+    }
   }
   
   return(list(allele_data = allele_data,

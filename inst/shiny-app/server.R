@@ -16,7 +16,7 @@ server <- function(input, output) {
       
       if(val==TRUE){
        output$condInput <- renderUI({ fileInput("genome", "Choose germline reference FASTA File",
-                                              multiple = FALSE,
+                                              multiple = TRUE,
                                                accept = c("text/tab-separated-values",".fasta",".fna",".ffn",".frn",".fa","text/plain"))
       })  
       }

@@ -72,14 +72,9 @@ params
 germline_reference <- NULL
 if (!is.null(params$genome_file)) {
   germline_reference <-
-    tigger::readIgFasta(params$genome_file)
+    unlist(lapply(params$genome_file, tigger::readIgFasta))
 } 
 
-if (params$full_or_basic == "Full sumrep stats") {
-  full_check = TRUE
-} else{
-  full_check = FALSE
-}
 print(params)
 ```
 
@@ -270,6 +265,14 @@ appearance_info <- bind_rows(v_usage_info$gene_data,
 appearance_info$segment <- substr(appearance_info$gene,1,4)
 
 size <- max(table(appearance_info$segment))
+
+genes_not_in_rep <- appearance_info$gene[!appearance_info$in_ref]
+genes_not_in_rep <- genes_not_in_rep[!is.na(genes_not_in_rep)]
+
+if(length(genes_not_in_rep)!=0){
+  print(paste0("The following genes were not found in the reference set supplied: ", paste0(genes_not_in_rep, collapse = ",")))
+}
+
 ```
 
 ```{r fig.height=size, warning=TRUE, fig.subcap=c("Unique allele calls per gene. Each row is a different gene segment (V/D/J). The x-axis is the different genes, and the y-axis is the count."),results="asis"}
@@ -281,7 +284,7 @@ ggplot2::ggplot(appearance_info,
   ggplot2::labs(x = "", y = "# of unique alleles") +
   ggplot2::facet_wrap(vars(!! sym("segment")), nrow = 1, 
                       ncol = 3,
-                      scales = "free") + coord_flip()
+                      scales = "free") + ggplot2::coord_flip()
 
 ```
 ## Relative usage
@@ -302,7 +305,7 @@ ggplot2::ggplot(usage_info,
   ggplot2::labs(x = "", y = "Relative usage") +
   ggplot2::facet_wrap(vars(!! sym("segment")), nrow = 1, 
                       ncol = 3,
-                      scales = "free") + coord_flip()
+                      scales = "free") + ggplot2::coord_flip()
 
 ```
 
@@ -574,7 +577,6 @@ gcContentDistribution(repertoire)
 Below table shows the comparison between the total number of sequences compares to the total number of unique CDR3 sequences and then compared to the number of CDR3 sequences that have multiple different v-call genes associated with them.
 ```{r CDR3_Chimera_Check, warning = TRUE ,fig.width=9}
 #SECTION 11
-if(full_check == TRUE){
 repertoire = repertoire[!is.na(repertoire$sequence),]
 cdr3_seq_info = checkCDR3(repertoire)
 
@@ -605,10 +607,6 @@ barplot(seqs_stats_vals,names.arg = labels,col='dark blue',xlab="Occurences" ,ma
 
 freq_table$Var2 <- as.factor(freq_table$Var2)
 ggplot(freq_table,aes(x=Var2,y=Freq,fill=Var1))+geom_bar(stat="identity")+guides(fill = "none", x=guide_axis(angle=90))+labs(x="Gene",y="Number of sequences present")
-}else{
-   writeLines("Only Basic stats were run , if you would like to get stats of possible chimeric sequences please run full stats.")
-   section_11 = "DarkGrey"
-}
 ```
 
 
@@ -625,11 +623,7 @@ if(length(repertoire$sequence)>100000){
 
 # if(seq_type == "")
 # display_type
-if (full_check == TRUE){
 plotVgeneDist(cdr3_vcalls,num_to_display, "aa",multiple_vgene_freq)
-}else{
-  writeLines("Only Basic stats were run , if you would like to get stats of possible chimeric sequences please run full stats.")
-}
 #kbl(most_chimeric)
 ```
 
