@@ -267,6 +267,7 @@ appearance_info$segment <- substr(appearance_info$gene,1,4)
 
 size <- max(table(appearance_info$segment))
 
+<<<<<<< HEAD
 if(!is.null(germline_reference)) {
   genes_not_in_rep <- appearance_info$gene[!appearance_info$in_ref]
   genes_not_in_rep <- genes_not_in_rep[!is.na(genes_not_in_rep)]
@@ -276,6 +277,16 @@ if(!is.null(germline_reference)) {
 }
 
 }
+=======
+if (!is.null(germline_reference)) {
+    genes_not_in_rep <- appearance_info$gene[!appearance_info$in_ref]
+    genes_not_in_rep <- genes_not_in_rep[!is.na(genes_not_in_rep)]
+    
+    if(length(genes_not_in_rep)!=0){
+        print(paste0("The following genes were not found in the reference set supplied: ", paste0(genes_not_in_rep, collapse = ",")))
+    }  
+}
+>>>>>>> 6e53668 (fix (maybe?) for non existing in_ref column)
 ```
 
 ```{r fig.height=size, warning=TRUE, fig.subcap=c("Unique allele calls per gene. Each row is a different gene segment (V/D/J). The x-axis is the different genes, and the y-axis is the count."),results="asis"}
