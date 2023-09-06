@@ -21,7 +21,9 @@ RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -
     zlib1g-dev
 
 ARG R_DEPS="c('devtools', \
-              'BiocManager', 'tigger')"
+              'BiocManager', \
+              'tigger', \
+              'optparse')"
 RUN Rscript -e "install.packages(${R_DEPS}, dependencies=TRUE, clean=TRUE)"
 RUN Rscript -e "BiocManager::install(c('Biostrings', 'GenomicAlignments', 'IRanges'))"
 #RUN Rscript -e "devtools::install_github('LuciaRotger/CollessLike', ref='master', dependencies=TRUE)"
