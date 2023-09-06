@@ -47,7 +47,7 @@ jobs:
         shell: bash
         
       - name: Run repcred
-      - run: |
+        run: |
            inst/repcred.R -r ${{ matrix.TEST_DATA }} -o outdir -d FALSE
   build:
 
