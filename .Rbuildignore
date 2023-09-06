@@ -9,4 +9,5 @@ install.R
 app.R
 runtime.txt
 binder
+docker
 LICENSE
