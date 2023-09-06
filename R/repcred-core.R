@@ -99,7 +99,7 @@ getCoreStats <- function(data){
 #' @param downsample Whether report will downsample repertoire
 #' @param genome  A reference set of the V(D)J alleles.
 #' @export
-render_report <- function(rep,outdir,genome=NULL,downsample) {
+render_report <- function(rep,outdir,genome=NULL,downsample=FALSE) {
     path = "../rstudio/templates/project/project_files/"
     if (!dir.exists(outdir)) {
         dir.create(outdir, recursive = T)
