@@ -88,6 +88,7 @@ getHotspotCount <- function (dat, column = "sequence_alignment", hotspots = c("W
                                                                            column, drop_gaps = FALSE), ...))
 }
 
+#' @export
 getHotspotCountDistribution <- function (dat, column = "sequence_alignment", hotspots = c("WRC", 
                                                            "WA"), ...) 
 {
@@ -96,6 +97,7 @@ getHotspotCountDistribution <- function (dat, column = "sequence_alignment", hot
   return(counts)
 }
 
+#' @export
 getColdspotCountDistribution <- function (dat, column = "sequence_alignment", coldspots="SYC", ...) 
 {
   counts <- dat %>% getColdspotCount(column = column, coldspots = coldspots, 
@@ -112,6 +114,7 @@ getGCContent <- function (raw_sequences)
   return(gc_dist)
 }
 
+#' @export
 getGCContentDistribution <- function (dat, column = "sequence_alignment", approximate = FALSE, 
           ...) 
 {
@@ -195,6 +198,7 @@ plotStats<-function(data,stats , main_text , xlab_text){
 # statistic on the sequence column
 # @param data repertoire data file in data.table format
 # 
+#' @export
 gcContentDistribution<- function(data){
   if(anyNA(data$sequence_alignment)){
     gc_distribution = getGCContentDistribution(data, column="sequence") 
@@ -274,6 +278,7 @@ gcContentDistribution<- function(data){
 # getHotspotCountDistribution()
 # @param data repertoire data file in data.table format
 # 
+#' @export
 hotspotCountDist <- function(data){
   hotspot <- getHotspotCountDistribution(data)
   stats <- getCoreStats(hotspot)
@@ -284,6 +289,7 @@ hotspotCountDist <- function(data){
 # getColdspotCountDistribution()
 # @param data repertoire data file in data.table format
 # 
+#' @export
 coldspotCountDist <- function(data){
   coldspot <- getColdspotCountDistribution(data)
   stats <- getCoreStats(coldspot)

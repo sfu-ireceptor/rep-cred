@@ -22,6 +22,7 @@ NULL
 #'@return A data.table containing the CDR3 sequence and the row it was taken from in the original repertoire file.
 #'
 #'
+#'@export
 checkCDR3 <- function(data) {
   row_count = 0
   seq_ids_vector = vector()
@@ -80,6 +81,7 @@ checkCDR3 <- function(data) {
 #'@param include_ambiguous_calls Boolean value of whether to include ambiguous v_calls in the analysis i.e. "IGHV-30D*1, or
 #'
 #'
+#'@export
 getVCalls <-
   function(cdr3_seqs_info,
            original_data,
@@ -144,6 +146,7 @@ getVCalls <-
 #'@param freq_table table containing the number of different v-calls for a given sequence.Used to rule out any sequences that only have one V-call associated with it.
 #'
 #'
+#'@export
 plotVgeneDist <-
   function(cdr3_data_table,
            num_of_results_to_show,

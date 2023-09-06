@@ -1,6 +1,7 @@
 #' @include repcred.R
 NULL
 
+#'@export
 addTrafficLighting <- function(vector_of_colours){
    css_file = file("results/repcred.css")
    
