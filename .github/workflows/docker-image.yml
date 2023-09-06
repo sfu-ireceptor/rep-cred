@@ -8,6 +8,46 @@ on:
 
 jobs:
 
+  R-CMD-check:
+    runs-on: ubuntu-latest
+    container:
+      image: rocker/verse:latest
+    strategy:
+       matrix:
+          TEST_DATA: [
+              "inst/extdata/ExampleDb.tsv"
+          ]      
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          if (!requireNamespace("BiocManager", quietly = TRUE))
+          install.packages("BiocManager")
+          BiocManager::install(c("Biostrings", "GenomicAlignments", "IRanges"))
+        shell: Rscript {0}
+
+      - name: Document
+        run: |
+          devtools::document()
+        shell: Rscript {0}
+
+      - name: Check
+        env:
+          _R_CHECK_CRAN_INCOMING_: false
+        run: |
+          options(crayon.enabled=TRUE)
+          rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran", "--run-donttest"), error_on="warning", check_dir="check")
+        shell: Rscript {0}
+
+      - name: Show testthat output
+        if: always()
+        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+        shell: bash
+        
+      - name: Run repcred
+      - run: |
+           inst/repcred.R -r ${{ matrix.TEST_DATA }} -o outdir -d FALSE
   build:
 
     runs-on: ubuntu-latest
