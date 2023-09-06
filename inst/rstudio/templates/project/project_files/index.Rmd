@@ -25,7 +25,7 @@ params:
    date: !r date()
    echo:  FALSE
    cache: FALSE
-   rep:  !r system.file("extdata", "P4_I4.tsv", package = "repcred")
+   rep:  !r system.file("extdata", "ExampleDb.tsv", package = "repcred")
    outdir: !r tempdir()
    genome_file: !r NULL
    full_or_basic: !r FALSE
@@ -54,7 +54,8 @@ library(stringr)
 library(ggplot2)
 library(data.table)
 library(seqinr)
-
+library(kableExtra)
+library(dplyr)
 # Configuration and default values
 gene_data = NA
 
@@ -142,6 +143,8 @@ if(any(!is.na(repertoire$productive))){
   non_prod <- any(!repertoire$productive)
 }
 vj_column <- "vj_in_frame" %in% colnames(repertoire)&!any(is.na(repertoire$vj_in_frame))
+
+cols_non_prod_breakdown <- all(c("vj_in_frame","stop_codon") %in% colnames(repertoire)) &!any(is.na(repertoire$vj_in_frame)) &!any(is.na(repertoire$stop_codon))
 ```
 
 `r  if(non_prod){"### Productive vs. non-productive sequences"}`
@@ -168,15 +171,13 @@ knitr::kable(prod_info %>%
 ```{r , eval=vj_column,comment=NA,results="asis"}
 writeLines(paste0("Retrived information from the vj_in_frame column, precentage of V-J seuqences in frame: ",formatC(mean(as.logical(repertoire$vj_in_frame))*100,digits = 5),"%"))
 ```
-`r  if(non_prod){"### Non-productive sequences breakdown"}`
+`r  if(cols_non_prod_breakdown){"### Non-productive sequences breakdown"}`
 
-```{r, fig.cap= "A breakdown of the type of non-productive sequences. The x-axis is the non-productive type, and the y-axis is the abdunce count. The red color represents sequences that has both a stop codon and the V-J is not in frame, gray color represents sequences that are in either types.", warning=TRUE, eval=non_prod}
+```{r, fig.cap= "A breakdown of the type of non-productive sequences. The x-axis is the non-productive type, and the y-axis is the abdunce count. The red color represents sequences that has both a stop codon and the V-J is not in frame, gray color represents sequences that are in either types.", warning=TRUE, eval=cols_non_prod_breakdown}
 ### table the columns that indicate non-productive sequences.
 
-cols <- c("vj_in_frame","stop_codon")
-
 ## check the cols are booleans. If not change
-
+col <- c("vj_in_frame","stop_codon")
 repertoire[[cols[1]]] <- if(is.logical(repertoire[[cols[1]]])) repertoire[[cols[1]]] else as.logical(repertoire[[cols[1]]])
 repertoire[[cols[2]]] <- if(is.logical(repertoire[[cols[2]]])) repertoire[[cols[2]]] else as.logical(repertoire[[cols[2]]])
 
@@ -253,7 +254,7 @@ knitr::kable(length_info)
 
 ## Number of unique allele calls per gene
 
-```{r}
+```{r calls info}
 v_usage_info <- getGeneAlleleStat(repertoire, reference = germline_reference, call = "v_call")
 d_usage_info <- getGeneAlleleStat(repertoire, reference = germline_reference, call = "d_call")
 j_usage_info <- getGeneAlleleStat(repertoire, reference = germline_reference, call = "j_call")
@@ -266,13 +267,15 @@ appearance_info$segment <- substr(appearance_info$gene,1,4)
 
 size <- max(table(appearance_info$segment))
 
-genes_not_in_rep <- appearance_info$gene[!appearance_info$in_ref]
-genes_not_in_rep <- genes_not_in_rep[!is.na(genes_not_in_rep)]
-
-if(length(genes_not_in_rep)!=0){
+if(!is.null(germline_reference)) {
+  genes_not_in_rep <- appearance_info$gene[!appearance_info$in_ref]
+  genes_not_in_rep <- genes_not_in_rep[!is.na(genes_not_in_rep)]
+  
+  if(length(genes_not_in_rep)!=0){
   print(paste0("The following genes were not found in the reference set supplied: ", paste0(genes_not_in_rep, collapse = ",")))
 }
 
+}
 ```
 
 ```{r fig.height=size, warning=TRUE, fig.subcap=c("Unique allele calls per gene. Each row is a different gene segment (V/D/J). The x-axis is the different genes, and the y-axis is the count."),results="asis"}
@@ -572,17 +575,22 @@ gcContentDistribution(repertoire)
 ```
 
 
+```{r, echo=FALSE}
+repertoire_chimera = repertoire[!is.na(repertoire$sequence),]
+chimera = nrow(repertoire_chimera)!=0
+```
 
-#  Possible Chimerisms
-Below table shows the comparison between the total number of sequences compares to the total number of unique CDR3 sequences and then compared to the number of CDR3 sequences that have multiple different v-call genes associated with them.
-```{r CDR3_Chimera_Check, warning = TRUE ,fig.width=9}
+`r  if(chimera){"#  Possible Chimerisms\nBelow table shows the comparison between the total number of sequences compares to the total number of unique CDR3 sequences and then compared to the number of CDR3 sequences that have multiple different v-call genes associated with them."}`
+
+
+```{r CDR3_Chimera_Check, warning = TRUE ,fig.width=9, eval=chimera}
 #SECTION 11
-repertoire = repertoire[!is.na(repertoire$sequence),]
-cdr3_seq_info = checkCDR3(repertoire)
+
+cdr3_seq_info = checkCDR3(repertoire_chimera)
 
 #table(cdr3_seq_info$cdr3_seq)
-cdr3_vcalls = getVCalls(cdr3_seq_info,repertoire,FALSE)
-total_num_unique_seq = length(unique(repertoire$sequence))
+cdr3_vcalls = getVCalls(cdr3_seq_info,repertoire_chimera,FALSE)
+total_num_unique_seq = length(unique(repertoire_chimera$sequence))
 ##
 num_uniq_cdr3_seq = length(unique(cdr3_seq_info$cdr3_seqs))
 
@@ -592,10 +600,11 @@ num_occur_multiple_gene_call <- length(which(data.frame(table(cdr3_seq_info$cdr3
 ####
 # 
  freq_table= data.frame(table(as.character(cdr3_vcalls$seq),as.character(cdr3_vcalls$v_call_genes)))
+names(freq_table) <- c("sequence","call","Freq")
  freq_table= freq_table[freq_table$Freq >1,]
-multiple_vgene_freq = data.frame(table(as.character(freq_table$Var1)))
+multiple_vgene_freq = data.frame(table(as.character(freq_table$sequence)))
 multiple_vgene_freq = multiple_vgene_freq[multiple_vgene_freq$Freq>1,]
-multiple_gene_calls = length(table(freq_table$Var1))
+multiple_gene_calls = length(table(freq_table$sequence))
 #print(freq_table)
 seqs_stats_vals=c(total_num_unique_seq,num_uniq_cdr3_seq,multiple_gene_calls)
 labels = c("Unique complete seqs" , "Unique CDR3 seqs" , "Unique CDR3 seqs with multiple single v-calls" )
@@ -605,14 +614,14 @@ par(mar=c(8, 13 ,5 ,3))
 barplot(seqs_stats_vals,names.arg = labels,col='dark blue',xlab="Occurences" ,main="CDR3 Sequence comparisons", las=2, horiz=TRUE ,cex.names=0.8)
 
 
-freq_table$Var2 <- as.factor(freq_table$Var2)
-ggplot(freq_table,aes(x=Var2,y=Freq,fill=Var1))+geom_bar(stat="identity")+guides(fill = "none", x=guide_axis(angle=90))+labs(x="Gene",y="Number of sequences present")
+freq_table$call <- as.factor(freq_table$call)
+ggplot(freq_table,aes(x=call,y=Freq,fill=sequence))+geom_bar(stat="identity")+guides(fill = "none", x=guide_axis(angle=90))+labs(x="Gene",y="Number of sequences present")
 ```
 
 
-Below contain CDR3 sequences with more than one v_call:
+`r  if(chimera){"Below contain CDR3 sequences with more than one v_call:"}`
 
-```{r warning = TRUE} 
+```{r warning = TRUE, eval=chimera} 
 options(width = 2000)
 num_to_display=0
 if(length(repertoire$sequence)>100000){
