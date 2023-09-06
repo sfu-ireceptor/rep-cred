@@ -23,9 +23,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          if (!requireNamespace("BiocManager", quietly = TRUE))
-          install.packages("BiocManager")
+          if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
           BiocManager::install(c("Biostrings", "GenomicAlignments", "IRanges"))
+          install.packages(c("airr", alakazam", "ape", "ggpubr", "kableExtra"))
         shell: Rscript {0}
 
       - name: Document
