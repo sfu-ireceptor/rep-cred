@@ -27,3 +27,5 @@ matrix:
       script:
         - R CMD build .
         - R CMD check *tar.gz --as-cran --run-donttest 
+        - Rscript -e "devtools::install('.')"
+        - inst/repcred.R -r inst/extdata/ExampleDb.tsv -o outdir -d FALSE
