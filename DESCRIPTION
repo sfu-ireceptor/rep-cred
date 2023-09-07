@@ -6,7 +6,8 @@ Authors@R: c(person("Susanna", "Marquez", role=c("aut", "cre"),
                     email="susanna.marquez@yale.edu"),
                      person("AIRR Community", role=c("cph")))
 Title: Repertoire Credibility 
-Description: Tools to evaluate the credibility of immune repertoires
+Description: RepCred: Repertoire Credibility. Tools to evaluate the credibility 
+             adaptive immune receptor repertoires.
 License: CC BY-SA 4.0
 BugReports: https://github.com/airr-community/rep-cred
 LazyData: true
@@ -29,6 +30,7 @@ Imports:
     ggpubr,
     kableExtra,
     knitr,
+    optparse,
     rmarkdown,
     stringr,
     stringi,
