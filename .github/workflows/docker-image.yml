@@ -46,6 +46,11 @@ jobs:
         run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
         shell: bash
         
+      - name: Install
+        run: |
+          devtools::install(".")
+        shell: Rscript {0}        
+        
       - name: Run repcred
         run: |
            inst/repcred.R -r ${{ matrix.TEST_DATA }} -o outdir -d FALSE
