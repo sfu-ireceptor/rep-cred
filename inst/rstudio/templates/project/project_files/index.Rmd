@@ -391,9 +391,9 @@ ggplot2::ggplot(usage_info,
 
 ### hot cold, and GC based on the sequence_alignment column
 
-hot_data <- getHotspotCountDistribution(repertoire)
-cold_data <- getColdspotCountDistribution(repertoire)
-gc_data <- getGCContentDistribution(repertoire)
+hot_data <- repcred:::getHotspotCountDistribution(repertoire)
+cold_data <- repcred:::getColdspotCountDistribution(repertoire)
+gc_data <- repcred:::getGCContentDistribution(repertoire)
 
 sumrep_info <- data.frame(
   "Category" = c(rep("HotSpot",length(hot_data)),
@@ -420,9 +420,9 @@ plot(0:1,xaxt='n',yaxt='n',ann=FALSE)
 legend("center",c("Mean +- standard dev","5% and 95% quantile points","Min and Max Value points"),fill=c("Dark blue","light blue","red"))
 
 if("sequence_alignment" %in% colnames(repertoire)&!any(is.na(repertoire$sequence_alignment))){
-hotspotCountDist(repertoire)
-coldspotCountDist(repertoire)
-gcContentDistribution(repertoire)
+repcred:::hotspotCountDist(repertoire)
+repcred:::coldspotCountDist(repertoire)
+repcred:::gcContentDistribution(repertoire)
 }else{
    section_6 = amber
     writeLines("Missing column : sequence_alignment \n Unable to run statistics : getHotspotCountDistribution , getColspotCountDistribution, getGCContentDistribution")
@@ -604,24 +604,28 @@ names(freq_table) <- c("sequence","call","Freq")
  freq_table= freq_table[freq_table$Freq >1,]
 multiple_vgene_freq = data.frame(table(as.character(freq_table$sequence)))
 multiple_vgene_freq = multiple_vgene_freq[multiple_vgene_freq$Freq>1,]
+multiple_vgene <- nrow(multiple_vgene_freq)!=0
 multiple_gene_calls = length(table(freq_table$sequence))
 #print(freq_table)
 seqs_stats_vals=c(total_num_unique_seq,num_uniq_cdr3_seq,multiple_gene_calls)
 labels = c("Unique complete seqs" , "Unique CDR3 seqs" , "Unique CDR3 seqs with multiple single v-calls" )
 
 ##
-par(mar=c(8, 13 ,5 ,3))
-barplot(seqs_stats_vals,names.arg = labels,col='dark blue',xlab="Occurences" ,main="CDR3 Sequence comparisons", las=2, horiz=TRUE ,cex.names=0.8)
+#par(mar=c(8, 13 ,5 ,3))
+#barplot(seqs_stats_vals,names.arg = labels,col='dark blue',xlab="Occurences" ,main="CDR3 Sequence comparisons", las=2, horiz=TRUE ,cex.names=0.8)
 
+ggplot(data.frame(label = labels, val = seqs_stats_vals), aes(x = label, y = val)) +
+  geom_col() + labs(y = "Occurences", x = "" , title="CDR3 Sequence comparisons") +
+  ggplot2::coord_flip() + theme_classic()
 
 freq_table$call <- as.factor(freq_table$call)
-ggplot(freq_table,aes(x=call,y=Freq,fill=sequence))+geom_bar(stat="identity")+guides(fill = "none", x=guide_axis(angle=90))+labs(x="Gene",y="Number of sequences present")
+ggplot(freq_table,aes(x=call,y=Freq,fill=sequence))+geom_bar(stat="identity")+guides(fill = "none", x=guide_axis(angle=90))+labs(x="Gene",y="Number of sequences present") + theme_classic()
 ```
 
 
-`r  if(chimera){"Below contain CDR3 sequences with more than one v_call:"}`
+`r  if(multiple_vgene){"Below contain CDR3 sequences with more than one v_call:"}`
 
-```{r warning = TRUE, eval=chimera} 
+```{r warning = TRUE, eval=multiple_vgene} 
 options(width = 2000)
 num_to_display=0
 if(length(repertoire$sequence)>100000){
@@ -632,14 +636,17 @@ if(length(repertoire$sequence)>100000){
 
 # if(seq_type == "")
 # display_type
-plotVgeneDist(cdr3_vcalls,num_to_display, "aa",multiple_vgene_freq)
+repcred:::plotVgeneDist(cdr3_data_table = cdr3_vcalls,
+                        num_of_results_to_show = num_to_display, 
+                        aa_or_nn = "aa", 
+                        freq_table = multiple_vgene_freq)
 #kbl(most_chimeric)
 ```
 
 ```{r warning = TRUE, results="asis"}
 #kbl(as.data.table(findAmplificationAreas(repertoire)))
 
-addTrafficLighting(c(section_1,section_2,section_3,section_4,section_5,section_6,section_7,section_8,section_9,section_10,section_11))
+repcred:::addTrafficLighting(c(section_1,section_2,section_3,section_4,section_5,section_6,section_7,section_8,section_9,section_10,section_11))
 ```
 
 
