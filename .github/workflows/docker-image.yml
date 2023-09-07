@@ -46,7 +46,7 @@ jobs:
         run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
         shell: bash
         
-      - name: Install
+      - name: Install repcred
         run: |
           devtools::install(".")
         shell: Rscript {0}        
@@ -54,6 +54,14 @@ jobs:
       - name: Run repcred
         run: |
            inst/repcred.R -r ${{ matrix.TEST_DATA }} -o outdir -d FALSE
+           
+      - name: Archive results
+        uses: actions/upload-artifact@v3
+        with:
+          name: repcred-report
+          path: |
+            outdir/results
+          
   build:
 
     runs-on: ubuntu-latest
