@@ -25,7 +25,7 @@ jobs:
         run: |
           if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
           BiocManager::install(c("Biostrings", "GenomicAlignments", "IRanges"))
-          install.packages(c("airr", "alakazam", "ape", "ggpubr", "kableExtra"))
+          install.packages(c("airr", "alakazam", "ape", "ggpubr", "kableExtra", "optparse"))
         shell: Rscript {0}
 
       - name: Document
@@ -45,6 +45,11 @@ jobs:
         if: always()
         run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
         shell: bash
+        
+      - name: Install
+        run: |
+          devtools::install(".")
+        shell: Rscript {0}        
         
       - name: Run repcred
         run: |

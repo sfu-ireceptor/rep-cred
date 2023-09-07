@@ -578,6 +578,7 @@ repcred:::gcContentDistribution(repertoire)
 ```{r, echo=FALSE}
 repertoire_chimera = repertoire[!is.na(repertoire$sequence),]
 chimera = nrow(repertoire_chimera)!=0
+multiple_vgene = FALSE
 ```
 
 `r  if(chimera){"#  Possible Chimerisms\nBelow table shows the comparison between the total number of sequences compares to the total number of unique CDR3 sequences and then compared to the number of CDR3 sequences that have multiple different v-call genes associated with them."}`

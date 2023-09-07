@@ -88,6 +88,14 @@ getHotspotCount <- function (dat, column = "sequence_alignment", hotspots = c("W
                                                                            column, drop_gaps = FALSE), ...))
 }
 
+#' getHotspotCountDistribution
+#' 
+#' @param dat An AIRR formatted data frame
+#' @param column the column sequence name
+#' @param hotspots An amino acid string of the hotspots pattern
+#' @param ... Additional arguments to send to getColdspotCount
+#' 
+#' @export
 getHotspotCountDistribution <- function (dat, column = "sequence_alignment", hotspots = c("WRC", 
                                                            "WA"), ...) 
 {
@@ -96,6 +104,14 @@ getHotspotCountDistribution <- function (dat, column = "sequence_alignment", hot
   return(counts)
 }
 
+#' getColdspotCountDistribution
+#' 
+#' @param dat An AIRR formatted data frame
+#' @param column the column sequence name
+#' @param coldspots An amino acid string of the coldspots pattern
+#' @param ... Additional arguments to send to getColdspotCount
+#' 
+#' @export
 getColdspotCountDistribution <- function (dat, column = "sequence_alignment", coldspots="SYC", ...) 
 {
   counts <- dat %>% getColdspotCount(column = column, coldspots = coldspots, 
@@ -112,8 +128,15 @@ getGCContent <- function (raw_sequences)
   return(gc_dist)
 }
 
-getGCContentDistribution <- function (dat, column = "sequence_alignment", approximate = FALSE, 
-          ...) 
+
+#' getGCContentDistribution
+#' 
+#' @param dat An AIRR formatted data frame
+#' @param column the column sequence name
+#' @param approximate if to receive an approximation of the GCC distribution content
+#' 
+#' @export
+getGCContentDistribution <- function (dat, column = "sequence_alignment", approximate = FALSE) 
 {
   sequence_list <- getColumnSequences(dat, column, drop_gaps = FALSE)
   distribution <- sequence_list %>% getGCContent
@@ -195,6 +218,16 @@ plotStats<-function(data,stats , main_text , xlab_text){
 # statistic on the sequence column
 # @param data repertoire data file in data.table format
 # 
+
+#' gcContentDistribution
+#' 
+#' Creates a plot and statistics from the output data of the sumrep function :
+#' getGCContentDistribution()
+#' If there are any NA values in the sequence alignment column it instead runs the
+#' statistic on the sequence column
+#' @param data repertoire data file in data.table format
+#' 
+#' @export
 gcContentDistribution<- function(data){
   if(anyNA(data$sequence_alignment)){
     gc_distribution = getGCContentDistribution(data, column="sequence") 
@@ -274,6 +307,15 @@ gcContentDistribution<- function(data){
 # getHotspotCountDistribution()
 # @param data repertoire data file in data.table format
 # 
+
+
+#' hotspotCountDist
+#' 
+#' Creates a plot and statistics from the output data of the sumrep function :
+#' getHotspotCountDistribution()
+#' @param data repertoire data file in data.table format
+#' 
+#' @export
 hotspotCountDist <- function(data){
   hotspot <- getHotspotCountDistribution(data)
   stats <- getCoreStats(hotspot)
@@ -284,6 +326,14 @@ hotspotCountDist <- function(data){
 # getColdspotCountDistribution()
 # @param data repertoire data file in data.table format
 # 
+
+#' coldspotCountDist
+#' 
+#' Creates a plot and statistics from the output data of the sumrep function :
+#' getColdspotCountDistribution()
+#' @param data repertoire data file in data.table format
+#' 
+#' @export
 coldspotCountDist <- function(data){
   coldspot <- getColdspotCountDistribution(data)
   stats <- getCoreStats(coldspot)
