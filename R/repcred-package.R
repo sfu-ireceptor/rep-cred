@@ -5,6 +5,7 @@
 #' @import      ggplot2
 #' @import      stringr
 #' @import      dplyr
+#' @import      optparse
 #' @importFrom  airr        read_rearrangement write_rearrangement validate_airr
 #' @importFrom  Biostrings  reverseComplement DNAString pairwiseAlignment nucleotideSubstitutionMatrix vcountPattern DNAStringSet
 #' @importFrom  knitr       kable 
