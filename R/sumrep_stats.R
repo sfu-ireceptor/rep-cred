@@ -88,6 +88,12 @@ getHotspotCount <- function (dat, column = "sequence_alignment", hotspots = c("W
                                                                            column, drop_gaps = FALSE), ...))
 }
 
+#' getHotspotCountDistribution
+#' 
+#' @param  dat #TODO
+#' @param  column #TODO
+#' @param  hotspots
+#' 
 #' @export
 getHotspotCountDistribution <- function (dat, column = "sequence_alignment", hotspots = c("WRC", 
                                                            "WA"), ...) 
@@ -97,6 +103,13 @@ getHotspotCountDistribution <- function (dat, column = "sequence_alignment", hot
   return(counts)
 }
 
+
+#' getColdspotCountDistribution
+#' 
+#' @param dat #TODO
+#' @param column #TODO
+#' @param coldspots #TODO
+#' 
 #' @export
 getColdspotCountDistribution <- function (dat, column = "sequence_alignment", coldspots="SYC", ...) 
 {
@@ -114,6 +127,12 @@ getGCContent <- function (raw_sequences)
   return(gc_dist)
 }
 
+#' getGCContentDistribution
+#' 
+#' @param dat #TODO
+#' @param column #TODO
+#' @param approximate #TODO
+#' 
 #' @export
 getGCContentDistribution <- function (dat, column = "sequence_alignment", approximate = FALSE, 
           ...) 
@@ -192,12 +211,14 @@ plotStats<-function(data,stats , main_text , xlab_text){
 #   print(kable(stats))
 # }
 
-# Creates a plot and statistics from the output data of the sumrep function :
-# getGCContentDistribution()
-# If there are any NA values in the sequence alignment column it instead runs the 
-# statistic on the sequence column
-# @param data repertoire data file in data.table format
-# 
+#' gcContentDistribution
+#' 
+#' Creates a plot and statistics from the output data of the sumrep function :
+#' getGCContentDistribution()
+#' If there are any NA values in the sequence alignment column it instead runs the
+#' statistic on the sequence column
+#' @param data repertoire data file in data.table format
+#' 
 #' @export
 gcContentDistribution<- function(data){
   if(anyNA(data$sequence_alignment)){
@@ -274,10 +295,14 @@ gcContentDistribution<- function(data){
 #   plotStats(gene_mut_pos,stats,"Histogram of gene mutation rates , per position", "Mutation Rate Value per Position")
 #   print(kable(stats))
 # }
-# Creates a plot and statistics from the output data of the sumrep function :
-# getHotspotCountDistribution()
-# @param data repertoire data file in data.table format
-# 
+
+
+#' hotspotCountDist
+#' 
+#' Creates a plot and statistics from the output data of the sumrep function :
+#' getHotspotCountDistribution()
+#' @param data repertoire data file in data.table format
+#' 
 #' @export
 hotspotCountDist <- function(data){
   hotspot <- getHotspotCountDistribution(data)
@@ -285,10 +310,13 @@ hotspotCountDist <- function(data){
   plotStats(hotspot,stats,"Histogram of Hotspot count distribution", "Hotspot Count")
   print(kable(stats))
 }
-# Creates a plot and statistics from the output data of the sumrep function :
-# getColdspotCountDistribution()
-# @param data repertoire data file in data.table format
-# 
+
+#' coldspotCountDist
+#' 
+#' Creates a plot and statistics from the output data of the sumrep function :
+#' getColdspotCountDistribution()
+#' @param data repertoire data file in data.table format
+#' 
 #' @export
 coldspotCountDist <- function(data){
   coldspot <- getColdspotCountDistribution(data)
