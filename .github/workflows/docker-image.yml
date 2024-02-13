@@ -55,11 +55,17 @@ jobs:
       - name: Run repcred
         run: |
            inst/repcred.R -r ${{ matrix.TEST_DATA }} -o outdir -d FALSE
+
+      - name: Create artifact name
+        run: |
+          test_data="${{ matrix.TEST_DATA }}"
+          artifact_name=$(echo -n "$test_data" | sed -e 's/\//_/g')
+          echo "ARTIFACT_NAME=$artifact_name" >> $GITHUB_ENV
            
       - name: Archive results
         uses: actions/upload-artifact@v3
         with:
-          name: repcred-report_${{ matrix.TEST_DATA }}
+          name: "repcred-report_${{ env.ARTIFACT_NAME }}"
           path: |
             outdir/results
           
