@@ -15,7 +15,8 @@ jobs:
     strategy:
        matrix:
           TEST_DATA: [
-              "inst/extdata/ExampleDb.tsv"
+              "inst/extdata/ExampleDb.tsv",
+              "test_repertoires/airr-covid-19.tsv"
           ]      
     steps:
       - name: Checkout
@@ -58,7 +59,7 @@ jobs:
       - name: Archive results
         uses: actions/upload-artifact@v3
         with:
-          name: repcred-report
+          name: repcred-report_${{ matrix.TEST_DATA }}
           path: |
             outdir/results
           
