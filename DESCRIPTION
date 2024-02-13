@@ -1,7 +1,7 @@
 Package: repcred
 Type: Package
 Version: 0.0.1
-Date: 2023-05-18
+Date: 2024-02-13
 Authors@R: c(person("Susanna", "Marquez", role=c("aut", "cre"), 
                     email="susanna.marquez@yale.edu"),
                      person("AIRR Community", role=c("cph")))
@@ -38,7 +38,7 @@ Imports:
     xfun,
 Suggests:
     testthat
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Collate:
     'repcred-package.R'
     'cdr3_check.R'
