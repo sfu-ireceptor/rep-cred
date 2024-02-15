@@ -23,6 +23,7 @@ repcredWeb <- function(appDir=system.file("shiny-app",
 #' @param downsample  Whether report will downsample repertoire
 #' @param genome_file A reference set of the V(D)J alleles.
 #' @param outdir      Directory where the report will be generated
+#' @param format Output format: html, pdf, all
 #' @return Path to the credibility report. 
 #' 
 #' @examples
@@ -30,8 +31,8 @@ repcredWeb <- function(appDir=system.file("shiny-app",
 #' rep_file <- system.file(package="repcred", "extdata", "ExampleDb.tsv")
 #' repcred_report(rep_file, tempdir())
 #' @export
-repcred_report <- function(rep, outdir=NULL,genome_file=NULL, downsample=TRUE) {
-    
+repcred_report <- function(rep, outdir=NULL,genome_file=NULL, downsample=TRUE, format=c("html", "pdf", "all")) {
+    format <- match.arg(format)
     if (file.exists(rep)) {
         if (is.null(outdir)) {
             outdir <- dirname(rep)
@@ -42,7 +43,7 @@ repcred_report <- function(rep, outdir=NULL,genome_file=NULL, downsample=TRUE) {
     
     tryCatch(
         {
-            report_path <- render_report(rep, outdir,genome_file,downsample)
+            report_path <- render_report(rep, outdir,genome_file,downsample, format)
         },
         error = function(e) {
             stop(safeError(e))
@@ -96,11 +97,13 @@ getCoreStats <- function(data){
 #' 
 #' @param rep Path to repertoire 
 #' @param outdir Directory where the report will be generated
-#' @param downsample Whether report will downsample repertoire
 #' @param genome  A reference set of the V(D)J alleles.
+#' @param downsample Whether report will downsample repertoire
+#' @param format Output format: html, pdf, all
 #' @export
-render_report <- function(rep,outdir,genome=NULL,downsample) {
+render_report <- function(rep,outdir,genome=NULL,downsample=TRUE, format=c("html","pdf","all")) {
     path = "../rstudio/templates/project/project_files/"
+    format <- match.arg(format)
     if (!dir.exists(outdir)) {
         dir.create(outdir, recursive = T)
     }
@@ -112,18 +115,38 @@ render_report <- function(rep,outdir,genome=NULL,downsample) {
     
     #setwd("../rstudio/templates/project/project_files/")
     
+    if (format == "html") {
+        output_format <- 'bookdown::gitbook'
+    } else if (format == "pdf") {
+        output_format <- 'bookdown::pdf_book'
+    } else {
+        output_format <- format
+    }
+    
     # render
     xfun::in_dir(
         outdir,
         book <- bookdown::render_book(
             input = ".",
-            output_format='bookdown::gitbook',
+            output_format=output_format,
             config_file ="_bookdown.yml",
             clean=FALSE,
             new_session=FALSE,
             params=list("rep"=rep, outdir=outdir,"genome_file"=genome,
                         "downsample"=downsample))
     )
+    if (format %in% c("pdf", "all")) {
+        is_pdf <- grepl("_main.pdf$",book)
+        for (i in which(is_pdf)) {
+            book_i <- gsub("_main.pdf$","repcred-report.pdf",book[i])
+            try(
+                if (file.rename(book[i],book_i)) {
+                    book[i] <- book_i
+                }
+            )
+        }
+    }
+    
     book
 }
 

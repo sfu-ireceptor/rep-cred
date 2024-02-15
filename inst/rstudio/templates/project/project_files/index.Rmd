@@ -21,6 +21,11 @@ output:
          download: yes
          sharing: no
          keep_md: true
+    bookdown::pdf_book:
+        keep_tex: false
+        toc: true
+        base_format: rmarkdown::pdf_document
+        number_sections: true         
 params:
    date: !r date()
    echo:  FALSE
