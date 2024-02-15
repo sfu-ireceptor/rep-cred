@@ -17,7 +17,11 @@ jobs:
           TEST_DATA: [
               "inst/extdata/ExampleDb.tsv",
               "test_repertoires/airr-covid-19.tsv"
-          ]      
+          ]
+          FORMAT: [
+              "html",
+              "pdf"
+          ]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -52,14 +56,14 @@ jobs:
           devtools::install(".")
         shell: Rscript {0}        
         
-      - name: Run repcred
+      - name: Run repcred (default output)
         run: |
-           inst/repcred.R -r ${{ matrix.TEST_DATA }} -o outdir -d FALSE
+           inst/repcred.R -r ${{ matrix.TEST_DATA }} -o outdir -d FALSE -f ${{ matrix.FORMAT }}
 
       - name: Create artifact name
         run: |
-          test_data="${{ matrix.TEST_DATA }}"
-          artifact_name=$(echo -n "$test_data" | sed -e 's/\//_/g')
+          test_name="${{ matrix.FORMAT }}_${{ matrix.TEST_DATA }}"
+          artifact_name=$(echo -n "$test_name" | sed -e 's/\//_/g' | sed -e 's/.tsv$//g' )
           echo "ARTIFACT_NAME=$artifact_name" >> $GITHUB_ENV
            
       - name: Archive results
