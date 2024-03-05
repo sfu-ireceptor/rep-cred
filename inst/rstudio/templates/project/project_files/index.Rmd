@@ -68,7 +68,6 @@ gene_data = NA
 green = "LightGreen"
 amber = "NavajoWhite"
 red = "pink"
-params
 ```
 
 #  Input parameters 
@@ -81,7 +80,7 @@ if (!is.null(params$genome_file)) {
     unlist(lapply(params$genome_file, tigger::readIgFasta))
 } 
 
-print(params)
+printParams(params)
 ```
 
 
