@@ -16,7 +16,8 @@ jobs:
        matrix:
           TEST_DATA: [
               "inst/extdata/ExampleDb.tsv",
-              "test_repertoires/airr-covid-19.tsv"
+              "test_repertoires/airr-covid-19.tsv",
+              "test_repertoires/PRJNA381394_12.tsv"
           ]
           FORMAT: [
               "html",
@@ -56,9 +57,9 @@ jobs:
           devtools::install(".")
         shell: Rscript {0}        
         
-      - name: Run repcred (default output)
+      - name: Run tests matrix
         run: |
-           inst/repcred.R -r ${{ matrix.TEST_DATA }} -o outdir -d FALSE -f ${{ matrix.FORMAT }}
+           inst/repcred.R -r ${{ matrix.TEST_DATA }} -o outdir -d TRUE -f ${{ matrix.FORMAT }}
 
       - name: Create artifact name
         run: |
