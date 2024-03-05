@@ -11,6 +11,7 @@
 #' @importFrom  knitr       kable 
 #' @importFrom  data.table  as.data.table data.table .SD
 #' @importFrom  graphics    barplot abline arrows barplot hist
+#' @importFrom  rlang       := sym syms enquo
 #' @importFrom  stats       na.omit quantile sd start
 #' @importFrom  utils       head
 #' @importFrom  ape         as.DNAbin GC.content
