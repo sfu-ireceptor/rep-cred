@@ -5,6 +5,7 @@
 ^data-raw
 ^docs
 ^archive_scripts
+^test_repertoires
 install.R
 app.R
 runtime.txt
