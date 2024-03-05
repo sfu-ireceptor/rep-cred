@@ -85,7 +85,7 @@ printParams(params)
 
 
 ```{r warning=FALSE}
-repertoire <- data.table::fread(params$rep)
+repertoire <- airr::read_rearrangement(params$rep)
 # Downsampling unless check box unticked
 num_keep <- 5000
 if (params$downsample & nrow(repertoire) > num_keep) {
