@@ -174,26 +174,20 @@ plotVgeneDist <-
         seq_data = cdr3_data_table[cdr3_data_table$seq == current_seq[[1]][1], ]
         seq_data = seq_data[, 2:3]
         
-        writeLines("<hr>")
-        writeLines(paste("<h2>Sequence :", current_seq, "</h2>"))
+        writeLines(paste("\n### Sequence:", current_seq))
+        writeLines("\n#### Barplot\n")
         barplot(
           table(as.character(seq_data$v_call_genes)),
           main = paste("Number of occurences of V-gene calls"),
           las = 2
         )
-        
-        #cat('\n')
+        writeLines("\n\n#### Data")
         print(knitr::kable(seq_data))
-        #cat('\n')
-        
         
         i = i + 1
       } else{
         i = i + 1
       }
       
-      
     }
-    
-    
   }
