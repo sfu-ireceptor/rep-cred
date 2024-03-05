@@ -72,7 +72,7 @@ red = "pink"
 
 #  Input parameters 
 
-```{r input-parameters}
+```{r input-parameters, results='asis'}
 #SECTION 1
 germline_reference <- NULL
 if (!is.null(params$genome_file)) {

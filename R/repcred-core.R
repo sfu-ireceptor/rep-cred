@@ -178,24 +178,5 @@ printParams <- function(p) {
         select(ind, values) %>%
         rename( parameter = ind,
                 value = values)
-    DT::datatable(df,
-                        filter="top", elementId = "params", 
-                        rownames = FALSE, fillContainer = F, 
-                        # style = 'bootstrap', 
-                        # class = 'table-bordered table-condensed',
-                        class = 'stripe hover order-column row-border compact',
-                        options = list(
-                            scrollX = TRUE,
-                            pageLength = 5,
-                            #https://stackoverflow.com/questions/44101055/changing-font-size-in-r-datatables-dt
-                            initComplete = DT::JS(
-                                "function(settings, json) {",
-                                "$(this.api().table().header()).css({'font-size': '50% !important'});",
-                                "}")
-                        )#,
-                        # caption = htmltools::tags$caption(
-                        #     style = 'caption-side: top; text-align: left;',
-                        #     caption
-                        # )
-    )   
+    print(kable(df))
 }
