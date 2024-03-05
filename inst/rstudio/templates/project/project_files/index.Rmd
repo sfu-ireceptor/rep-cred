@@ -633,9 +633,9 @@ ggplot(freq_table,aes(x=call,y=Freq,fill=sequence))+geom_bar(stat="identity")+gu
 ```
 
 
-`r  if(multiple_vgene){"Below contain CDR3 sequences with more than one v_call:"}`
+`r  if(multiple_vgene){"## CDR3 sequences with more than one v_call:"}`
 
-```{r warning = TRUE, eval=multiple_vgene} 
+```{r warning = TRUE, eval=multiple_vgene, results='asis'} 
 options(width = 2000)
 num_to_display=0
 if(length(repertoire$sequence)>100000){

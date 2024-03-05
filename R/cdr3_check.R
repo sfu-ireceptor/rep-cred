@@ -36,23 +36,22 @@ checkCDR3 <- function(data) {
   sequence_id = which(colnames(data) == "sequence_id")
   for (seq in data$sequence) {
     row_count = row_count + 1
-    seq_id = data[row_count, sequence_id, with = FALSE]
-    start_num = (data[row_count, cdr3_start, with = FALSE])
-    end_num = (data[row_count, cdr3_end, with = FALSE])
-    cdr3_val = (data[row_count, cdr3, with = FALSE])
-    junction_val = (data[row_count, junction, with = FALSE])
+    seq_id = data[[sequence_id]][row_count]
+    start_num = data[[cdr3_start]][row_count]
+    end_num = data[[cdr3_end]][row_count]
+    cdr3_val = data[[cdr3]][row_count]
+    junction_val = data[[junction]][row_count]
     if (!anyNA(cdr3_val)) {
-      cdr3_seqs = c(cdr3_seqs, cdr3_val[[1]])
+      cdr3_seqs = c(cdr3_seqs, cdr3_val)
       seq_ids_vector = c(seq_ids_vector, seq_id)
       row_number = c(row_number, row_count)
     } else{
-      if (!is.na(junction_val) | junction_val != "") {
-        cdr3_seqs = c(cdr3_seqs, junction_val[[1]])
+      if (!junction_val %in% c(NA, "")) {
+        cdr3_seqs = c(cdr3_seqs, junction_val)
         row_number = c(row_number, row_count)
         seq_ids_vector = c(seq_ids_vector, seq_id)
       } else{
-        if (data[row_count, rev_comp, with = FALSE] == "TRUE" |
-            data[row_count, rev_comp, with = FALSE] == 'T') {
+        if (data[[rev_comp]][row_count] %in% c("T", "TRUE", T, TRUE, 1)) {
           seq = reverseComplement(DNAString(seq))
           cdr3_seqs = c(cdr3_seqs, substr(toString(seq), start_num, end_num))
           row_number = c(row_number, row_count)
@@ -63,8 +62,6 @@ checkCDR3 <- function(data) {
           seq_ids_vector = c(seq_ids_vector, seq_id)
         }
       }
-      
-      
     }
     
   }
