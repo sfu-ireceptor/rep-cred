@@ -12,3 +12,4 @@ runtime.txt
 binder
 docker
 LICENSE
+^.*\.code-workspace
