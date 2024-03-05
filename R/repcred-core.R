@@ -174,7 +174,7 @@ repcred_project <- function(path,...) {
 #' @export
 #' @export
 printParams <- function(p) {
-    df <- stack(p) %>%
+    df <- utils::stack(p) %>%
         select(ind, values) %>%
         rename( parameter = ind,
                 value = values)
