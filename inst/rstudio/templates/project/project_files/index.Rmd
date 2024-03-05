@@ -140,15 +140,19 @@ This section provides useful statistics about the repertoire:
 ```{r}
 repertoire$productive <- as.logical(repertoire$productive)
 non_prod <- F
-if(any(!is.na(repertoire$productive))){
+if (any(!is.na(repertoire$productive))) {
   prod_info <- data.table("Category"=factor(repertoire$productive, 
                                  levels = c("TRUE","FALSE")))
   
   non_prod <- any(!repertoire$productive)
 }
-vj_column <- "vj_in_frame" %in% colnames(repertoire)&!any(is.na(repertoire$vj_in_frame))
+vj_column <- "vj_in_frame" %in% colnames(repertoire) & 
+             !any(is.na(repertoire$vj_in_frame))
 
-cols_non_prod_breakdown <- all(c("vj_in_frame","stop_codon") %in% colnames(repertoire)) &!any(is.na(repertoire$vj_in_frame)) &!any(is.na(repertoire$stop_codon))
+cols_non_prod_breakdown <-  non_prod & 
+                            all(c("vj_in_frame","stop_codon") %in% colnames(repertoire)) &
+                            !any(is.na(repertoire$vj_in_frame)) & 
+                            !any(is.na(repertoire$stop_codon))
 ```
 
 `r  if(non_prod){"### Productive vs. non-productive sequences"}`
