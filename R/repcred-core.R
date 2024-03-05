@@ -170,8 +170,7 @@ repcred_project <- function(path,...) {
 
 #' Print input parameters as a table
 #' 
-#' @param params Params from the yaml section of the report. 
-#' @export
+#' @param p Params from the yaml section of the report. 
 #' @export
 printParams <- function(p) {
     df <- utils::stack(p) %>%
