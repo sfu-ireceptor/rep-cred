@@ -389,7 +389,12 @@ ggplot2::ggplot(usage_info,
 
 # General Sumrep Statistics
 
-```{r warning=TRUE,results="asis"}
+
+```{r,  eval=all(is.na(repertoire$sequence_alignment))}
+print("Skipping this section: `sequence_alignment` is empty.")
+```
+
+```{r warning=TRUE,results="asis", eval=any(!is.na(repertoire$sequence_alignment))}
 
 ### summrep statistics graphs = hot/cold spots, GC content, Mutation and germline
 
