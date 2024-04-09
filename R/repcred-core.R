@@ -175,7 +175,7 @@ repcred_project <- function(path,...) {
 printParams <- function(p) {
     df <- utils::stack(p) %>%
         select(!!!rlang::syms(c("ind", "values"))) %>%
-        rename( parameter = ind,
-                value = values)
+        rename( parameter = !!rlang::sym("ind"),
+                value = !!rlang::sym("values"))
     print(kable(df))
 }
