@@ -1,5 +1,27 @@
 FROM rocker/shiny:4.2.3
 
+########################################################### 
+# iReceptor custom changes 
+RUN apt-get update
+# We need ZIP
+RUN apt-get install -y zip
+# We need python (if the container isn't already a pyton container)
+RUN apt-get install -y python3-pip python3-venv
+
+# We need to copy the iReceptor specific files into the container. There may
+# not be any, but as a recipe we leave this in.
+ENV IRECEPTOR_FOLDER="/ireceptor"
+#COPY ./ireceptor $IRECEPTOR_FOLDER
+# Set up our python environment. Between AIRR and anndata we get all subpackages
+# we need, the key one being pandas.
+RUN python3 -m venv $IRECEPTOR_FOLDER 
+ENV PATH="$IRECEPTOR_FOLDER/bin:$PATH"
+RUN pip3 install wheel
+RUN pip3 install airr
+RUN pip3 install anndata
+# End iReceptor customizations
+########################################################### 
+
 LABEL maintainer="ssnn"
 
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y --fix-missing \
@@ -17,6 +39,10 @@ RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -
     libxml2-dev \
     make \
     pandoc \
+    texlive-latex-base \
+    texlive-fonts-recommended \
+    texlive-fonts-extra \
+    texlive-latex-extra \
     xdg-utils \
     zlib1g-dev
 
