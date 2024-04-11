@@ -17,6 +17,10 @@ RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -
     libxml2-dev \
     make \
     pandoc \
+    texlive-latex-base \
+    texlive-fonts-recommended \
+    texlive-fonts-extra \
+    texlive-latex-extra \
     xdg-utils \
     zlib1g-dev
 
