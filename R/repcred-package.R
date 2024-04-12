@@ -9,7 +9,7 @@
 #' @importFrom  airr        read_rearrangement write_rearrangement validate_airr
 #' @importFrom  Biostrings  reverseComplement DNAString pairwiseAlignment nucleotideSubstitutionMatrix vcountPattern DNAStringSet
 #' @importFrom  knitr       kable 
-#' @importFrom  data.table  as.data.table data.table .SD
+#' @importFrom  data.table  as.data.table data.table
 #' @importFrom  graphics    barplot abline arrows barplot hist
 #' @importFrom  rlang       := sym syms enquo
 #' @importFrom  stats       na.omit quantile sd start

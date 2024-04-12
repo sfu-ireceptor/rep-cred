@@ -189,7 +189,7 @@ cols <- c("vj_in_frame","stop_codon")
 repertoire[[cols[1]]] <- if(is.logical(repertoire[[cols[1]]])) repertoire[[cols[1]]] else as.logical(repertoire[[cols[1]]])
 repertoire[[cols[2]]] <- if(is.logical(repertoire[[cols[2]]])) repertoire[[cols[2]]] else as.logical(repertoire[[cols[2]]])
 
-prod_info <- repertoire[!repertoire$productive, .SD, .SD=cols] %>% 
+prod_info <- repertoire[!repertoire$productive, cols, drop=F] %>% 
   dplyr::mutate(vj_not_frame = !(!!as.name("vj_in_frame")),
                 both = (!!as.name("vj_not_frame")) & (!!as.name("stop_codon")) ) %>%
   dplyr::select(!!as.name("vj_not_frame"),!!as.name("stop_codon"),!!as.name("both")) %>%
@@ -264,7 +264,10 @@ knitr::kable(length_info)
 
 ```{r calls info}
 v_usage_info <- getGeneAlleleStat(repertoire, reference = germline_reference, call = "v_call")
-d_usage_info <- getGeneAlleleStat(repertoire, reference = germline_reference, call = "d_call")
+d_usage_info <- data.frame()
+if (any(!is.na(repertoire[["d_call"]]))) {
+    d_usage_info <- getGeneAlleleStat(repertoire, reference = germline_reference, call = "d_call")
+}
 j_usage_info <- getGeneAlleleStat(repertoire, reference = germline_reference, call = "j_call")
 
 appearance_info <- bind_rows(v_usage_info$gene_data,
