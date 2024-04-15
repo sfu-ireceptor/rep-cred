@@ -120,9 +120,18 @@ if (!is_compliant) {
 }
 
 missing_columns <- findMissingColumns(repertoire)
+
 if (length(missing_columns) > 0) {
-  writeLines("<h3> Columns with missing / No data </h3> ")
-  kbl(data.table(column_name = missing_columns))
+    writeLines("<h3> Columns with missing / No data </h3> ")
+    
+    if ("sequence_alignment" %in% missing_columns) {
+        if (all(is.na(repertoire$sequence_alignment))) {
+            formattedErrorMeassage("Required `sequence_alignment` is empty. Exiting analysis.")
+            knitr::knit_exit()               
+        }
+    }
+    
+    kbl(data.table(column_name = missing_columns))
 }
 ```
 
@@ -301,6 +310,7 @@ ggplot2::ggplot(appearance_info,
                       scales = "free") + ggplot2::coord_flip()
 
 ```
+
 ## Relative usage
 
 ```{r fig.height=size, warning=TRUE, fig.subcap=c("Gene usage. Each row is a different gene segment (V/D/J). The x-axis is the different genes, and the y-axis is the relative usage."),results="asis"}
