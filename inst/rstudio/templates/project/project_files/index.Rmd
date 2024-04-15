@@ -120,6 +120,10 @@ if (!is_compliant) {
 }
 
 missing_columns <- findMissingColumns(repertoire)
+if ("sequence_alignment" %in% missing_columns) {
+  formattedErrorMeassage("Required `sequence_alignment` is missing or empty. Exiting analysis.")
+  knitr::knit_exit()    
+}
 if (length(missing_columns) > 0) {
   writeLines("<h3> Columns with missing / No data </h3> ")
   kbl(data.table(column_name = missing_columns))
