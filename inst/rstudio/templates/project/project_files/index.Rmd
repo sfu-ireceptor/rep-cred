@@ -301,6 +301,7 @@ ggplot2::ggplot(appearance_info,
                       scales = "free") + ggplot2::coord_flip()
 
 ```
+
 ## Relative usage
 
 ```{r fig.height=size, warning=TRUE, fig.subcap=c("Gene usage. Each row is a different gene segment (V/D/J). The x-axis is the different genes, and the y-axis is the relative usage."),results="asis"}
