@@ -115,19 +115,20 @@ is_compliant <-
   suppressWarnings(airr::validate_rearrangement(repertoire)) # TODO: consider if to display the warning
 
 if (!is_compliant) {
-  formattedErrorMeassage("The repertoire is not AIRR compliant. Exiting analysis.")
+  repcred:::formattedErrorMeassage("The repertoire is not AIRR compliant. Exiting analysis.")
   knitr::knit_exit()
 }
 
 missing_columns <- findMissingColumns(repertoire)
+sequence_alignment_available <- TRUE
 
 if (length(missing_columns) > 0) {
     writeLines("<h3> Columns with missing / No data </h3> ")
     
     if ("sequence_alignment" %in% missing_columns) {
-        if (all(is.na(repertoire$sequence_alignment))) {
-            formattedErrorMeassage("Required `sequence_alignment` is empty. Exiting analysis.")
-            knitr::knit_exit()               
+        sequence_alignment_available <- any(!is.na(repertoire[["sequence_alignment"]]))
+        if (!sequence_alignment_available) {
+            repcred:::formattedWarningMeassage("Required `sequence_alignment` is empty.")
         }
     }
     
@@ -138,7 +139,7 @@ if (length(missing_columns) > 0) {
 
 # Non-nucleotides in sequence
 
-```{r warning=FALSE}
+```{r warning=FALSE, results='asis'}
 #SECTION 3
 check_nucleotides(repertoire) # TODO: this works only on the sequence column. If missing, should it be changed to sequence_alignment?
 ```
@@ -238,7 +239,11 @@ knitr::kable(data.frame("Category" = c("Contains stop codons",
 
 ### Sequence length distribution
 
-```{r, fig.cap="The sequences length distribution. The x-axis is the binned sequence lengths, and the y-axis is the frequency.", warning=FALSE,results="asis"}
+```{r,  eval=!sequence_alignment_available, results='asis'}
+cat("Skipping this section: `sequence_alignment` is empty.")
+```
+
+```{r, fig.cap="The sequences length distribution. The x-axis is the binned sequence lengths, and the y-axis is the frequency.", warning=FALSE,results="asis", eval=sequence_alignment_available}
 
 
 length_info <- data.frame(region = c(rep("Input sequence",nrow(repertoire)),
@@ -407,8 +412,8 @@ ggplot2::ggplot(usage_info,
 # General Sumrep Statistics
 
 
-```{r,  eval=all(is.na(repertoire$sequence_alignment))}
-print("Skipping this section: `sequence_alignment` is empty.")
+```{r,  eval=!sequence_alignment_available, results='asis'}
+cat("Skipping this section: `sequence_alignment` is empty.")
 ```
 
 ```{r warning=TRUE,results="asis", eval=any(!is.na(repertoire$sequence_alignment))}
