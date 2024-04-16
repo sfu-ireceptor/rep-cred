@@ -121,6 +121,9 @@ jobs:
           ]
     
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
       - name: Run repcred command
         run: |
            repcred -r ${{ matrix.TEST_DATA }} -o outdir -d TRUE -f ${{ matrix.FORMAT }}
