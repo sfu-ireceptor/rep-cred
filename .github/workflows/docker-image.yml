@@ -91,8 +91,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-          context: ./docker
-          file: ./docker/Dockerfile          
       - name: Build and push to Docker
         uses: docker/build-push-action@v4
         with:
