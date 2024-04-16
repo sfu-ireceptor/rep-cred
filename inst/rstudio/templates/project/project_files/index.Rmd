@@ -118,14 +118,15 @@ if (!is_compliant) {
 missing_columns <- findMissingColumns(repertoire)
 if (length(missing_columns) > 0) {
   writeLines("<h3> Columns with missing / No data </h3> ")
-  kbl(data.table(column_name = missing_columns))
+  #kbl(data.table(column_name = missing_columns))
+  writeLines(paste0(missing_columns, collapse = ","))
 }
 ```
 
 
 # Non-nucleotides in sequence
 
-```{r warning=FALSE}
+```{r check_nucleotides, warning=FALSE}
 #SECTION 3
 check_nucleotides(repertoire) # TODO: this works only on the sequence column. If missing, should it be changed to sequence_alignment?
 ```
@@ -133,45 +134,56 @@ check_nucleotides(repertoire) # TODO: this works only on the sequence column. If
 # Statistics
 This section provides useful statistics about the repertoire:
 
-```{r}
+```{r productive_info}
 repertoire$productive <- as.logical(repertoire$productive)
 non_prod <- F
 if(any(!is.na(repertoire$productive))){
   prod_info <- data.table("Category"=factor(repertoire$productive, 
                                  levels = c("TRUE","FALSE")))
-  
   non_prod <- any(!repertoire$productive)
 }
-vj_column <- "vj_in_frame" %in% colnames(repertoire)&!any(is.na(repertoire$vj_in_frame))
-
-cols_non_prod_breakdown <- all(c("vj_in_frame","stop_codon") %in% colnames(repertoire)) &!any(is.na(repertoire$vj_in_frame)) &!any(is.na(repertoire$stop_codon))
 ```
 
-`r  if(non_prod){"### Productive vs. non-productive sequences"}`
-```{r, fig.cap= "The number of productive and non productive sequences. The x-axis is the productive definition, and the y-axis is the abdunce count.",warning=TRUE, eval=non_prod }
+```{r vj_column_info}
+vj_column <- "vj_in_frame" %in% colnames(repertoire)&!any(is.na(repertoire$vj_in_frame))
+```
+
+```{r cols_non_prod_breakdown}
+cols_non_prod_breakdown <- all(c("vj_in_frame","stop_codon") %in% colnames(repertoire)) &!any(is.na(repertoire$vj_in_frame)) &!any(is.na(repertoire$stop_codon))
+if(cols_non_prod_breakdown){
+  cols_non_prod_breakdown <- cols_non_prod_breakdown & non_prod
+}
+```
+
+## Productive vs. non-productive sequences
+
+```{r non_prod_figure, fig.cap= "The number of productive and non productive sequences. The x-axis is the productive definition, and the y-axis is the abdunce count.", warning=TRUE,results="asis"}
 #SECTION 4
 ggplot2::ggplot(
   prod_info, 
   aes(x = !!as.name("Category"))) +
   ggplot2::geom_bar(stat="count") + 
   ggpubr::theme_pubclean() +
-  ggplot2::labs(x = "", y = "Occurences") +
+  ggplot2::labs(x = "", y = "Number of sequences") +
   ggplot2::scale_x_discrete(drop = FALSE, labels=c("Productive", "Non-productive", "NA/Not specified"))
-
-knitr::kable(prod_info %>% 
-      dplyr::count(!!as.name("Category"), name = "Occurences", .drop = F) %>% 
-      dplyr::mutate("Category" = as.character(!!as.name("Category")),
-                    "Category" =  dplyr::recode(!!as.name("Category"),"TRUE"="Productive",
-                                             "FALSE"="Non-productive"),
-                    "Category" = tidyr::replace_na(!!as.name("Category"),"NA/Not specified")))
 ```
 
-`r  if(vj_column){"### Percentage of sequences where the V and J region are in-frame"}`
+```{r non_prod_table, warning=FALSE,results="asis"}
+knitr::kable(prod_info %>% 
+      dplyr::count(!!as.name("Category"), name = "Number of sequences", .drop = F) %>%  
+        dplyr::mutate("Category" = as.character(!!as.name("Category")),
+                     "Category" =  dplyr::recode(!!as.name("Category"),"TRUE"="Productive",
+                                              "FALSE"="Non-productive"),
+                     "Category" = tidyr::replace_na(!!as.name("Category"),"NA/Not specified")))
+```
+
+`r  if(vj_column){"## Percentage of sequences where the V and J region are in-frame"}`
 
 ```{r , eval=vj_column,comment=NA,results="asis"}
 writeLines(paste0("Retrived information from the vj_in_frame column, precentage of V-J seuqences in frame: ",formatC(mean(as.logical(repertoire$vj_in_frame))*100,digits = 5),"%"))
 ```
-`r  if(cols_non_prod_breakdown){"### Non-productive sequences breakdown"}`
+
+`r  if(cols_non_prod_breakdown){"## Non-productive sequences breakdown"}`
 
 ```{r, fig.cap= "A breakdown of the type of non-productive sequences. The x-axis is the non-productive type, and the y-axis is the abdunce count. The red color represents sequences that has both a stop codon and the V-J is not in frame, gray color represents sequences that are in either types.", warning=TRUE, eval=cols_non_prod_breakdown}
 ### table the columns that indicate non-productive sequences.
@@ -219,7 +231,7 @@ knitr::kable(data.frame("Category" = c("Contains stop codons",
                                              "stop_codon"="Contains stop codons")))
 ```
 
-### Sequence length distribution
+## Sequence length distribution
 
 ```{r, fig.cap="The sequences length distribution. The x-axis is the binned sequence lengths, and the y-axis is the frequency.", warning=FALSE,results="asis"}
 
@@ -252,8 +264,6 @@ knitr::kable(length_info)
 ```
 # Annotation Calls Statistics
 
-## Number of unique allele calls per gene
-
 ```{r calls info}
 v_usage_info <- getGeneAlleleStat(repertoire, reference = germline_reference, call = "v_call")
 d_usage_info <- getGeneAlleleStat(repertoire, reference = germline_reference, call = "d_call")
@@ -278,6 +288,8 @@ if(!is.null(germline_reference)) {
 }
 ```
 
+## Number of unique allele calls per gene
+
 ```{r fig.height=size, warning=TRUE, fig.subcap=c("Unique allele calls per gene. Each row is a different gene segment (V/D/J). The x-axis is the different genes, and the y-axis is the count."),results="asis"}
 ggplot2::ggplot(appearance_info, 
   ggplot2::aes(x = !!as.name("gene"), y = !!as.name("count_unique_alleles"))) +
@@ -290,6 +302,7 @@ ggplot2::ggplot(appearance_info,
                       scales = "free") + ggplot2::coord_flip()
 
 ```
+
 ## Relative usage
 
 ```{r fig.height=size, warning=TRUE, fig.subcap=c("Gene usage. Each row is a different gene segment (V/D/J). The x-axis is the different genes, and the y-axis is the relative usage."),results="asis"}
@@ -385,7 +398,7 @@ ggplot2::ggplot(usage_info,
 
 # General Sumrep Statistics
 
-```{r warning=TRUE,results="asis"}
+```{r warning=FALSE,results="asis"}
 
 ### summrep statistics graphs = hot/cold spots, GC content, Mutation and germline
 
@@ -626,7 +639,7 @@ ggplot(freq_table,aes(x=call,y=Freq,fill=sequence))+geom_bar(stat="identity")+gu
 
 `r  if(multiple_vgene){"Below contain CDR3 sequences with more than one v_call:"}`
 
-```{r warning = TRUE, eval=multiple_vgene} 
+```{r cdr3_dist, warning = TRUE, eval=multiple_vgene} 
 options(width = 2000)
 num_to_display=0
 if(length(repertoire$sequence)>100000){
@@ -644,9 +657,9 @@ repcred:::plotVgeneDist(cdr3_data_table = cdr3_vcalls,
 #kbl(most_chimeric)
 ```
 
-```{r warning = TRUE, results="asis"}
+```{r trafic_light, warning = TRUE, results="asis"}
 #kbl(as.data.table(findAmplificationAreas(repertoire)))
-#repcred:::addTrafficLighting(c(section_1,section_2,section_3,section_4,section_5,section_6,section_7,section_8,section_9,section_10,section_11))
+repcred:::addTrafficLighting(c(section_1,section_2,section_3,section_4,section_5,section_6,section_7,section_8,section_9,section_10,section_11))
 ```
 
 

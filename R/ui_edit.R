@@ -2,40 +2,40 @@
 NULL
 
 # @export
-# addTrafficLighting <- function(vector_of_colours){
-#    css_file = file("results/repcred.css")
-#    
-#    div_main_css = "#div-main {
-#     position:fixed;
-#     top: calc(35%);
-#     left: calc(35%);
-#     }"
-#    
-#    shiny_notif_css = ".shiny-notification {
-#     position:fixed;
-#     top: calc(55%);
-#     left: calc(35%);
-#     width: 300px;
-# }"
-#    line_list <- vector("character" , length(vector_of_colours)+2)
-#    line_list[1] = div_main_css
-#    line_list[2] = shiny_notif_css
-#    i=1
-#    
-#    for(color in vector_of_colours){
-#     single_element_css = paste("li.chapter",as.character(i),"{",
-#                        "background:",as.character(color),";",
-#                        "}"
-#                        ,sep="")
-#     
-#     line_list[i+2] = single_element_css
-#     i=i+1
-#     
-#    }
-#    writeLines(line_list,css_file)
-#    close(css_file)
-#    
-#  }
+addTrafficLighting <- function(vector_of_colours){
+   css_file = file("results/repcred.css")
+
+   div_main_css = "#div-main {
+    position:fixed;
+    top: calc(35%);
+    left: calc(35%);
+    }"
+
+   shiny_notif_css = ".shiny-notification {
+    position:fixed;
+    top: calc(55%);
+    left: calc(35%);
+    width: 300px;
+}"
+   line_list <- vector("character" , length(vector_of_colours)+2)
+   line_list[1] = div_main_css
+   line_list[2] = shiny_notif_css
+   i=1
+
+   for(color in vector_of_colours){
+    single_element_css = paste("li.chapter",as.character(i),"{",
+                       "background:",as.character(color),";",
+                       "}"
+                       ,sep="")
+
+    line_list[i+2] = single_element_css
+    i=i+1
+
+   }
+   writeLines(line_list,css_file)
+   close(css_file)
+
+ }
 
 #'
 #'
