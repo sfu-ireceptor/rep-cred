@@ -1,5 +1,6 @@
 ##### rep-cred functions for index.Rmd
 #' @include repcred.R
+NULL
 
 ##########################################################################
 # color functions

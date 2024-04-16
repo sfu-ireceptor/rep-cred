@@ -40,10 +40,9 @@ Suggests:
     testthat
 RoxygenNote: 7.2.3
 Collate:
-    'repcred-package.R'
+    'repcred.R'
     'cdr3_check.R'
     'repcred-core.R'
-    'repcred.R'
     'report-functions.R'
     'sumrep_stats.R'
     'ui_edit.R'

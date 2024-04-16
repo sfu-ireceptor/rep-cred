@@ -5,9 +5,12 @@
 ^data-raw
 ^docs
 ^archive_scripts
+^test_repertoires
 install.R
 app.R
 runtime.txt
 binder
 docker
 LICENSE
+^.*\.code-workspace
+^R/\.repcred-package.R

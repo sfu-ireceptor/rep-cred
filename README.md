@@ -1,7 +1,7 @@
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)]()
 [![Documentation Status](https://readthedocs.org/projects/rep-cred/badge/?version=latest)](https://rep-cred.readthedocs.io/en/latest/?badge=latest)
-[![Build Status](https://travis-ci.org/airr-community/rep-cred.svg?branch=master)](https://travis-ci.org/airr-community/rep-cred)
+[![Docker Image CI](https://github.com/airr-community/rep-cred/actions/workflows/docker-image.yml/badge.svg)](https://github.com/airr-community/rep-cred/actions/workflows/docker-image.yml)
 
 
 

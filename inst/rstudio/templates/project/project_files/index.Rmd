@@ -177,7 +177,7 @@ writeLines(paste0("Retrived information from the vj_in_frame column, precentage 
 ### table the columns that indicate non-productive sequences.
 
 ## check the cols are booleans. If not change
-col <- c("vj_in_frame","stop_codon")
+cols <- c("vj_in_frame","stop_codon")
 repertoire[[cols[1]]] <- if(is.logical(repertoire[[cols[1]]])) repertoire[[cols[1]]] else as.logical(repertoire[[cols[1]]])
 repertoire[[cols[2]]] <- if(is.logical(repertoire[[cols[2]]])) repertoire[[cols[2]]] else as.logical(repertoire[[cols[2]]])
 
@@ -646,8 +646,7 @@ repcred:::plotVgeneDist(cdr3_data_table = cdr3_vcalls,
 
 ```{r warning = TRUE, results="asis"}
 #kbl(as.data.table(findAmplificationAreas(repertoire)))
-
-repcred:::addTrafficLighting(c(section_1,section_2,section_3,section_4,section_5,section_6,section_7,section_8,section_9,section_10,section_11))
+#repcred:::addTrafficLighting(c(section_1,section_2,section_3,section_4,section_5,section_6,section_7,section_8,section_9,section_10,section_11))
 ```
 
 

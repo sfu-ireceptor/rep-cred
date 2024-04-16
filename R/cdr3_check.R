@@ -8,7 +8,7 @@
 
 # Include libraries and functions -----------------------------------------------------
 
-#' @include repcred-package.R
+#' @include repcred.R
 NULL
 
 ##########################################################################

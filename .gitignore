@@ -9,3 +9,4 @@ man/
 **/vignettes/*.html
 .directory
 .idea
+.history

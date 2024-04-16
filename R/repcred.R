@@ -1,7 +1,10 @@
-#' The repcred package
+#' @aliases repcred-package
+"_PACKAGE"
+
+#' repcred
 #'
-#' The \code{repcred} package provides a repertoire credibility check
-#' for adaptive immune receptor repertoire (AIRR) data. 
+#' Here we provide an automated tool for repertoire credibility check
+#' of adaptive immune receptor repertoire (AIRR) data. 
 #'
 #'
 #' @section  GUI application:
@@ -13,7 +16,7 @@
 #' }
 #'
 #' @name     repcred
-#'
+#' 
 #' @import      alakazam
 #' @import      ggplot2
 #' @import      stringr
