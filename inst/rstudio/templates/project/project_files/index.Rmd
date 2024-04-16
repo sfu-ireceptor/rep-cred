@@ -600,7 +600,7 @@ num_occur_multiple_gene_call <- length(which(data.frame(table(cdr3_seq_info$cdr3
 
 ####
 # 
- freq_table= data.frame(table(as.character(cdr3_vcalls$seq),as.character(cdr3_vcalls$v_call_genes)))
+freq_table= data.frame(table(as.character(cdr3_vcalls$seq),as.character(cdr3_vcalls$v_call_genes)))
 names(freq_table) <- c("sequence","call","Freq")
  freq_table= freq_table[freq_table$Freq >1,]
 multiple_vgene_freq = data.frame(table(as.character(freq_table$sequence)))
