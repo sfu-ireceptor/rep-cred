@@ -140,7 +140,7 @@ non_prod <- F
 if(any(!is.na(repertoire$productive))){
   prod_info <- data.table("Category"=factor(repertoire$productive, 
                                  levels = c("TRUE","FALSE")))
-  non_prod <- any(!repertoire$productive)
+  non_prod <- T
 }
 ```
 
@@ -157,7 +157,7 @@ if(cols_non_prod_breakdown){
 
 ## Productive vs. non-productive sequences
 
-```{r non_prod_figure, fig.cap= "The number of productive and non productive sequences. The x-axis is the productive definition, and the y-axis is the abdunce count.", warning=TRUE,results="asis"}
+```{r non_prod_figure, fig.cap= "The number of productive and non productive sequences. The x-axis is the productive definition, and the y-axis is the abdunce count.", warning=TRUE,results="asis", eval=non_prod}
 #SECTION 4
 ggplot2::ggplot(
   prod_info, 
@@ -168,7 +168,7 @@ ggplot2::ggplot(
   ggplot2::scale_x_discrete(drop = FALSE, labels=c("Productive", "Non-productive", "NA/Not specified"))
 ```
 
-```{r non_prod_table, warning=FALSE,results="asis"}
+```{r non_prod_table, warning=FALSE,results="asis", eval=non_prod}
 knitr::kable(prod_info %>% 
       dplyr::count(!!as.name("Category"), name = "Number of sequences", .drop = F) %>%  
         dplyr::mutate("Category" = as.character(!!as.name("Category")),
