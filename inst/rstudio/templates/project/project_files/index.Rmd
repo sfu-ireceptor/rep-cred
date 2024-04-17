@@ -683,7 +683,7 @@ if (multiple_vgene) {
 
 `r  if(multiple_vgene){"Below contain CDR3 sequences with more than one v_call:"}`
 
-```{r cdr3_dist, warning = TRUE, eval=multiple_vgene} 
+```{r cdr3_dist, warning = TRUE, eval=multiple_vgene, results='asis'} 
 options(width = 2000)
 num_to_display=0
 if(length(repertoire$sequence)>100000){
