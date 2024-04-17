@@ -164,4 +164,18 @@ repcred_project <- function(path,...) {
     dir.create(project_dir, recursive = TRUE, showWarnings = FALSE)
     project_files <- list.files(skeleton_dir,full.names = T)
     file.copy(project_files, project_dir, recursive=TRUE)
-} 
+}
+
+
+
+#' Print input parameters as a table
+#' 
+#' @param p Params from the yaml section of the report. 
+#' @export
+printParams <- function(p) {
+    df <- utils::stack(p) %>%
+        select(!!!rlang::syms(c("ind", "values"))) %>%
+        rename( parameter = !!rlang::sym("ind"),
+                value = !!rlang::sym("values"))
+    print(kable(df))
+}
