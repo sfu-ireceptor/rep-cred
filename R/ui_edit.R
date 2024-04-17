@@ -70,3 +70,13 @@ formattedErrorMeassage <- function(x) {
       '</div>', sep = '\n')
     writeLines(txt)
 }
+
+#'
+#'
+#'
+formattedWarningMeassage <- function(x) {
+    txt <- paste('\n\n<div class="alert alert-warning">',
+                 gsub('##', '\n', gsub('^##\ Warning', '**Warning**', x)),
+                 '</div>', sep = '\n')
+    writeLines(txt)
+}

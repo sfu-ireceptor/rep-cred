@@ -1,4 +1,4 @@
-FROM rocker/shiny:4.2.3
+FROM rocker/shiny:4.3.3
 
 LABEL maintainer="ssnn"
 
@@ -17,6 +17,10 @@ RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -
     libxml2-dev \
     make \
     pandoc \
+    texlive-latex-base \
+    texlive-fonts-recommended \
+    texlive-fonts-extra \
+    texlive-latex-extra \    
     xdg-utils \
     zlib1g-dev
 

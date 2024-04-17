@@ -21,6 +21,11 @@ output:
          download: yes
          sharing: no
          keep_md: true
+    bookdown::pdf_book:
+        keep_tex: false
+        toc: true
+        base_format: rmarkdown::pdf_document
+        number_sections: true           
 params:
    date: !r date()
    echo:  FALSE
@@ -63,12 +68,11 @@ gene_data = NA
 green = "LightGreen"
 amber = "NavajoWhite"
 red = "pink"
-params
 ```
 
 #  Input parameters 
 
-```{r input-parameters}
+```{r input-parameters, results='asis'}
 #SECTION 1
 germline_reference <- NULL
 if (!is.null(params$genome_file)) {
@@ -76,12 +80,12 @@ if (!is.null(params$genome_file)) {
     unlist(lapply(params$genome_file, tigger::readIgFasta))
 } 
 
-print(params)
+printParams(params)
 ```
 
 
 ```{r warning=FALSE}
-repertoire <- data.table::fread(params$rep)
+repertoire <- airr::read_rearrangement(params$rep)
 # Downsampling unless check box unticked
 num_keep <- 5000
 if (params$downsample & nrow(repertoire) > num_keep) {
@@ -105,7 +109,7 @@ section_11 = green
 ```
 # Quality Control Stats
 
-```{r warning=TRUE,results="asis"}
+```{r missing_columns, warning=TRUE,results="asis"}
 #SECTION 2
 is_compliant <-
   suppressWarnings(airr::validate_rearrangement(repertoire)) # TODO: consider if to display the warning
@@ -116,17 +120,24 @@ if (!is_compliant) {
 }
 
 missing_columns <- findMissingColumns(repertoire)
+sequence_alignment_available <- TRUE
 if (length(missing_columns) > 0) {
-  writeLines("<h3> Columns with missing / No data </h3> ")
-  #kbl(data.table(column_name = missing_columns))
-  writeLines(paste0(missing_columns, collapse = ","))
+    writeLines("<h3> Columns with missing / No data </h3> ")
+    if ("sequence_alignment" %in% missing_columns) {
+        sequence_alignment_available <- any(!is.na(repertoire[["sequence_alignment"]]))
+        if (!sequence_alignment_available) {
+            formattedWarningMeassage("Required `sequence_alignment` is empty.")
+        }
+    }
+    #kbl(data.table(column_name = missing_columns))
+    writeLines(paste0(missing_columns, collapse = ","))
 }
 ```
 
 
 # Non-nucleotides in sequence
 
-```{r check_nucleotides, warning=FALSE}
+```{r check_nucleotides, warning=FALSE, results='asis'}
 #SECTION 3
 check_nucleotides(repertoire) # TODO: this works only on the sequence column. If missing, should it be changed to sequence_alignment?
 ```
@@ -137,25 +148,31 @@ This section provides useful statistics about the repertoire:
 ```{r productive_info}
 repertoire$productive <- as.logical(repertoire$productive)
 non_prod <- F
-if(any(!is.na(repertoire$productive))){
+if (any(!is.na(repertoire$productive))) {
   prod_info <- data.table("Category"=factor(repertoire$productive, 
                                  levels = c("TRUE","FALSE")))
-  non_prod <- T
+  non_prod <- any(!repertoire$productive)
+  # non_prod <- T
 }
 ```
 
 ```{r vj_column_info}
-vj_column <- "vj_in_frame" %in% colnames(repertoire)&!any(is.na(repertoire$vj_in_frame))
+vj_column <- "vj_in_frame" %in% colnames(repertoire) & 
+    !any(is.na(repertoire$vj_in_frame))
 ```
 
 ```{r cols_non_prod_breakdown}
-cols_non_prod_breakdown <- all(c("vj_in_frame","stop_codon") %in% colnames(repertoire)) &!any(is.na(repertoire$vj_in_frame)) &!any(is.na(repertoire$stop_codon))
-if(cols_non_prod_breakdown){
-  cols_non_prod_breakdown <- cols_non_prod_breakdown & non_prod
-}
+cols_non_prod_breakdown <-  non_prod & 
+    all(c("vj_in_frame","stop_codon") %in% colnames(repertoire)) &
+    !any(is.na(repertoire$vj_in_frame)) & 
+    !any(is.na(repertoire$stop_codon))
 ```
 
 ## Productive vs. non-productive sequences
+
+```{r,  eval=!non_prod, results='asis'}
+cat("Skipping this section: non-productive sequences not present in the repertoire.")
+```
 
 ```{r non_prod_figure, fig.cap= "The number of productive and non productive sequences. The x-axis is the productive definition, and the y-axis is the abdunce count.", warning=TRUE,results="asis", eval=non_prod}
 #SECTION 4
@@ -193,7 +210,7 @@ cols <- c("vj_in_frame","stop_codon")
 repertoire[[cols[1]]] <- if(is.logical(repertoire[[cols[1]]])) repertoire[[cols[1]]] else as.logical(repertoire[[cols[1]]])
 repertoire[[cols[2]]] <- if(is.logical(repertoire[[cols[2]]])) repertoire[[cols[2]]] else as.logical(repertoire[[cols[2]]])
 
-prod_info <- repertoire[!repertoire$productive, .SD, .SD=cols] %>% 
+prod_info <- repertoire[!repertoire$productive, cols, drop=F] %>% 
   dplyr::mutate(vj_not_frame = !(!!as.name("vj_in_frame")),
                 both = (!!as.name("vj_not_frame")) & (!!as.name("stop_codon")) ) %>%
   dplyr::select(!!as.name("vj_not_frame"),!!as.name("stop_codon"),!!as.name("both")) %>%
@@ -233,7 +250,11 @@ knitr::kable(data.frame("Category" = c("Contains stop codons",
 
 ## Sequence length distribution
 
-```{r, fig.cap="The sequences length distribution. The x-axis is the binned sequence lengths, and the y-axis is the frequency.", warning=FALSE,results="asis"}
+```{r,  eval=!sequence_alignment_available, results='asis'}
+cat("Skipping this section: `sequence_alignment` is empty.")
+```
+
+```{r, fig.cap="The sequences length distribution. The x-axis is the binned sequence lengths, and the y-axis is the frequency.", warning=FALSE,results="asis", eval=sequence_alignment_available}
 
 
 length_info <- data.frame(region = c(rep("Input sequence",nrow(repertoire)),
@@ -262,11 +283,16 @@ length_info <- length_info %>% dplyr::group_by(!!as.name("region")) %>%
   )
 knitr::kable(length_info)
 ```
+
 # Annotation Calls Statistics
+
 
 ```{r calls info}
 v_usage_info <- getGeneAlleleStat(repertoire, reference = germline_reference, call = "v_call")
-d_usage_info <- getGeneAlleleStat(repertoire, reference = germline_reference, call = "d_call")
+d_usage_info <- data.frame()
+if (any(!is.na(repertoire[["d_call"]]))) {
+    d_usage_info <- getGeneAlleleStat(repertoire, reference = germline_reference, call = "d_call")
+}
 j_usage_info <- getGeneAlleleStat(repertoire, reference = germline_reference, call = "j_call")
 
 appearance_info <- bind_rows(v_usage_info$gene_data,
@@ -398,7 +424,12 @@ ggplot2::ggplot(usage_info,
 
 # General Sumrep Statistics
 
-```{r warning=FALSE,results="asis"}
+
+```{r,  eval=!sequence_alignment_available, results='asis'}
+cat("Skipping this section: `sequence_alignment` is empty.")
+```
+
+```{r warning=TRUE,results="asis", eval=any(!is.na(repertoire$sequence_alignment))}
 
 ### summrep statistics graphs = hot/cold spots, GC content, Mutation and germline
 
@@ -418,7 +449,7 @@ sumrep_info <- data.frame(
 sumrep_info$Category <- factor(sumrep_info$Category, levels = c("HotSpot","ColdSpot","GC content"))
 
 ggplot2::ggplot(sumrep_info,
-                ggplot2::aes_string(x=1,y="values" ,color="Category")) + 
+                ggplot2::aes(x=1,y=values, color=Category)) + 
   ggplot2::geom_violin() + 
   ggplot2::geom_boxplot(width = 0.2, outlier.shape = NA) + 
   ggplot2::guides(color = "none") + 
@@ -613,13 +644,19 @@ num_occur_multiple_gene_call <- length(which(data.frame(table(cdr3_seq_info$cdr3
 
 ####
 # 
-freq_table= data.frame(table(as.character(cdr3_vcalls$seq),as.character(cdr3_vcalls$v_call_genes)))
-names(freq_table) <- c("sequence","call","Freq")
- freq_table= freq_table[freq_table$Freq >1,]
-multiple_vgene_freq = data.frame(table(as.character(freq_table$sequence)))
-multiple_vgene_freq = multiple_vgene_freq[multiple_vgene_freq$Freq>1,]
-multiple_vgene <- nrow(multiple_vgene_freq)!=0
-multiple_gene_calls = length(table(freq_table$sequence))
+if (nrow(cdr3_vcalls)>0) {
+    
+    freq_table= data.frame(table(as.character(cdr3_vcalls$seq),as.character(cdr3_vcalls$v_call_genes)))
+    names(freq_table) <- c("sequence","call","Freq")
+    freq_table= freq_table[freq_table$Freq >1,]
+    multiple_vgene_freq = data.frame(table(as.character(freq_table$sequence)))
+    multiple_vgene_freq = multiple_vgene_freq[multiple_vgene_freq$Freq>1,]
+    multiple_vgene <- nrow(multiple_vgene_freq)!=0
+    multiple_gene_calls = length(table(freq_table$sequence))
+} else {
+    multiple_gene_calls <- 0
+}
+
 #print(freq_table)
 seqs_stats_vals=c(total_num_unique_seq,num_uniq_cdr3_seq,multiple_gene_calls)
 labels = c("Unique complete seqs" , "Unique CDR3 seqs" , "Unique CDR3 seqs with multiple single v-calls" )
@@ -632,8 +669,15 @@ ggplot(data.frame(label = labels, val = seqs_stats_vals), aes(x = label, y = val
   geom_col() + labs(y = "Occurences", x = "" , title="CDR3 Sequence comparisons") +
   ggplot2::coord_flip() + theme_classic()
 
-freq_table$call <- as.factor(freq_table$call)
-ggplot(freq_table,aes(x=call,y=Freq,fill=sequence))+geom_bar(stat="identity")+guides(fill = "none", x=guide_axis(angle=90))+labs(x="Gene",y="Number of sequences present") + theme_classic()
+if (multiple_vgene) {
+    freq_table$call <- as.factor(freq_table$call)
+    ggplot(freq_table,
+            aes(x=call,y=Freq,fill=sequence))+
+            geom_bar(stat="identity")+
+            guides(fill = "none", x=guide_axis(angle=90))+
+            labs(x="Gene",y="Number of sequences present") + 
+            theme_classic() 
+}
 ```
 
 

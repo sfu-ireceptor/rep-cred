@@ -13,5 +13,6 @@
 #' @importFrom  stats       na.omit quantile sd start
 #' @importFrom  utils       head
 #' @importFrom  ape         as.DNAbin GC.content
+#' @importFrom  rlang       := sym syms enquo
 NULL
 # @importFrom  stringr     str_replace str_replace_all str_match_all str_match str_split str_count str_length str_replace_all str_pad
