@@ -8,7 +8,7 @@
 
 # Include libraries and functions -----------------------------------------------------
 
-#' @include repcred-package.R
+#' @include repcred.R
 NULL
 
 ##########################################################################
@@ -36,22 +36,23 @@ checkCDR3 <- function(data) {
   sequence_id = which(colnames(data) == "sequence_id")
   for (seq in data$sequence) {
     row_count = row_count + 1
-    seq_id = data[[sequence_id]][row_count]
-    start_num = data[[cdr3_start]][row_count]
-    end_num = data[[cdr3_end]][row_count]
-    cdr3_val = data[[cdr3]][row_count]
-    junction_val = data[[junction]][row_count]
+    seq_id = data[row_count, sequence_id, with = FALSE]
+    start_num = (data[row_count, cdr3_start, with = FALSE])
+    end_num = (data[row_count, cdr3_end, with = FALSE])
+    cdr3_val = (data[row_count, cdr3, with = FALSE])
+    junction_val = (data[row_count, junction, with = FALSE])
     if (!anyNA(cdr3_val)) {
-      cdr3_seqs = c(cdr3_seqs, cdr3_val)
+      cdr3_seqs = c(cdr3_seqs, cdr3_val[[1]])
       seq_ids_vector = c(seq_ids_vector, seq_id)
       row_number = c(row_number, row_count)
     } else{
-      if (!junction_val %in% c(NA, "")) {
-        cdr3_seqs = c(cdr3_seqs, junction_val)
+      if (!is.na(junction_val) | junction_val != "") {
+        cdr3_seqs = c(cdr3_seqs, junction_val[[1]])
         row_number = c(row_number, row_count)
         seq_ids_vector = c(seq_ids_vector, seq_id)
       } else{
-        if (data[[rev_comp]][row_count] %in% c("T", "TRUE", T, TRUE, 1)) {
+        if (data[row_count, rev_comp, with = FALSE] == "TRUE" |
+            data[row_count, rev_comp, with = FALSE] == 'T') {
           seq = reverseComplement(DNAString(seq))
           cdr3_seqs = c(cdr3_seqs, substr(toString(seq), start_num, end_num))
           row_number = c(row_number, row_count)
@@ -62,6 +63,8 @@ checkCDR3 <- function(data) {
           seq_ids_vector = c(seq_ids_vector, seq_id)
         }
       }
+      
+      
     }
     
   }
@@ -174,20 +177,26 @@ plotVgeneDist <-
         seq_data = cdr3_data_table[cdr3_data_table$seq == current_seq[[1]][1], ]
         seq_data = seq_data[, 2:3]
         
-        writeLines(paste("\n### Sequence:", current_seq))
-        writeLines("\n#### Barplot\n")
+        writeLines("<hr>")
+        writeLines(paste("<h2>Sequence :", current_seq, "</h2>"))
         barplot(
           table(as.character(seq_data$v_call_genes)),
           main = paste("Number of occurences of V-gene calls"),
           las = 2
         )
-        writeLines("\n\n#### Data")
+        
+        #cat('\n')
         print(knitr::kable(seq_data))
+        #cat('\n')
+        
         
         i = i + 1
       } else{
         i = i + 1
       }
       
+      
     }
+    
+    
   }

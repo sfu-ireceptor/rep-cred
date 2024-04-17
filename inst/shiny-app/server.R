@@ -37,19 +37,14 @@ server <- function(input, output) {
       
    })
    
-
    observeEvent(input$go, {
-      
       output$openResultsBtn <- renderUI({
       
       #req(input$file1)
       withProgress(
          tryCatch(
             {
-               # Hack to show the real file name in the inputs section of the report
-               new_name <- gsub(basename(input$file1$datapath), input$file1$name, input$file1$datapath)
-               file.rename(input$file1$datapath, new_name)
-               dataValues$repcred_report_path <- repcred_report(new_name,
+               dataValues$repcred_report_path <- repcred_report(input$file1$datapath,
                                                                 genome_file=input$genome$datapath,
                                                                 #sumrep = input$sumrep,
                                                                 downsample = input$input_downsample)

@@ -32,7 +32,7 @@ return(cleaned_test_names)
 GetTestFiles <- function(){
   all_files = list.files(path="../../R")
   cleaned_test_names <- vector()
-  core_files = c("Data.R" , "repcred-core.R" , "repcred-package.R")
+  core_files = c("Data.R" , "repcred-core.R" , "repcred.R")
   all_files = setdiff(all_files,core_files)
   return(all_files)
 }

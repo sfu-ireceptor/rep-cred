@@ -20,6 +20,7 @@ suppressPackageStartupMessages(library("repcred"))
 REP <- NULL
 OUTDIR <- tempdir()
 DOWN <- TRUE
+GERM <- NULL
 FORMAT <- "html"
 
 # Define commmandline arguments
@@ -27,6 +28,8 @@ opt_list <- list(make_option(c("-r", "--rep"), dest="REP", default=REP,
                              help="Repertoire file, in AIRR (TSV) format."),
                  make_option(c("-d", "--down"), dest="DOWN", default=DOWN,
                              help="Downsample."),
+                 make_option(c("-g", "--germline"), dest="GERM", default=GERM,
+                             help="Germline reference file in fasta format."),
                  make_option(c("-o", "--outdir"), dest="OUTDIR", default=OUTDIR,
                              help=paste("Output directory. Will be created if it does not exist.",
                                         "\n\t\tDefaults to the current working directory.")),
@@ -65,7 +68,7 @@ sink(file(file.path(opt$OUTDIR,"message.log"),"wt"), type="message")
 sink(file(file.path(opt$OUTDIR,"output.log"),"wt"), type="output")
 
 tryCatch(
-    report <- render_report(rep=opt$REP, outdir=opt$OUTDIR, downsample = opt$DOWN, format=opt$FORMAT),
+    report <- render_report(rep=opt$REP, outdir=opt$OUTDIR, genome = opt$GERM, downsample = opt$DOWN, format=opt$FORMAT),
     error = function(e) {
         stop(safeError(e))
     }

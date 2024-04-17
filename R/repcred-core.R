@@ -23,7 +23,6 @@ repcredWeb <- function(appDir=system.file("shiny-app",
 #' @param downsample  Whether report will downsample repertoire
 #' @param genome_file A reference set of the V(D)J alleles.
 #' @param outdir      Directory where the report will be generated
-#' @param format Output format: html, pdf, all
 #' @return Path to the credibility report. 
 #' 
 #' @examples
@@ -31,8 +30,8 @@ repcredWeb <- function(appDir=system.file("shiny-app",
 #' rep_file <- system.file(package="repcred", "extdata", "ExampleDb.tsv")
 #' repcred_report(rep_file, tempdir())
 #' @export
-repcred_report <- function(rep, outdir=NULL,genome_file=NULL, downsample=TRUE, format=c("html", "pdf", "all")) {
-    format <- match.arg(format)
+repcred_report <- function(rep, outdir=NULL,genome_file=NULL, downsample=TRUE) {
+    
     if (file.exists(rep)) {
         if (is.null(outdir)) {
             outdir <- dirname(rep)
@@ -43,7 +42,7 @@ repcred_report <- function(rep, outdir=NULL,genome_file=NULL, downsample=TRUE, f
     
     tryCatch(
         {
-            report_path <- render_report(rep, outdir,genome_file,downsample, format)
+            report_path <- render_report(rep, outdir,genome_file,downsample)
         },
         error = function(e) {
             stop(safeError(e))
@@ -97,13 +96,11 @@ getCoreStats <- function(data){
 #' 
 #' @param rep Path to repertoire 
 #' @param outdir Directory where the report will be generated
-#' @param genome  A reference set of the V(D)J alleles.
 #' @param downsample Whether report will downsample repertoire
-#' @param format Output format: html, pdf, all
+#' @param genome  A reference set of the V(D)J alleles.
 #' @export
-render_report <- function(rep,outdir,genome=NULL,downsample=TRUE, format=c("html","pdf","all")) {
+render_report <- function(rep,outdir,genome=NULL,downsample) {
     path = "../rstudio/templates/project/project_files/"
-    format <- match.arg(format)
     if (!dir.exists(outdir)) {
         dir.create(outdir, recursive = T)
     }
@@ -115,38 +112,18 @@ render_report <- function(rep,outdir,genome=NULL,downsample=TRUE, format=c("html
     
     #setwd("../rstudio/templates/project/project_files/")
     
-    if (format == "html") {
-        output_format <- 'bookdown::gitbook'
-    } else if (format == "pdf") {
-        output_format <- 'bookdown::pdf_book'
-    } else {
-        output_format <- format
-    }
-    
     # render
     xfun::in_dir(
         outdir,
         book <- bookdown::render_book(
             input = ".",
-            output_format=output_format,
+            output_format='bookdown::gitbook',
             config_file ="_bookdown.yml",
             clean=FALSE,
             new_session=FALSE,
             params=list("rep"=rep, outdir=outdir,"genome_file"=genome,
                         "downsample"=downsample))
     )
-    if (format %in% c("pdf", "all")) {
-        is_pdf <- grepl("_main.pdf$",book)
-        for (i in which(is_pdf)) {
-            book_i <- gsub("_main.pdf$","repcred-report.pdf",book[i])
-            try(
-                if (file.rename(book[i],book_i)) {
-                    book[i] <- book_i
-                }
-            )
-        }
-    }
-    
     book
 }
 
@@ -165,17 +142,3 @@ repcred_project <- function(path,...) {
     project_files <- list.files(skeleton_dir,full.names = T)
     file.copy(project_files, project_dir, recursive=TRUE)
 } 
-
-
-
-#' Print input parameters as a table
-#' 
-#' @param p Params from the yaml section of the report. 
-#' @export
-printParams <- function(p) {
-    df <- utils::stack(p) %>%
-        select(!!!rlang::syms(c("ind", "values"))) %>%
-        rename( parameter = !!rlang::sym("ind"),
-                value = !!rlang::sym("values"))
-    print(kable(df))
-}

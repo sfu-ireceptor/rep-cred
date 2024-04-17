@@ -1,7 +1,7 @@
 Package: repcred
 Type: Package
 Version: 0.0.1
-Date: 2024-04-16
+Date: 2023-05-18
 Authors@R: c(person("Susanna", "Marquez", role=c("aut", "cre"), 
                     email="susanna.marquez@yale.edu"),
                      person("AIRR Community", role=c("cph")))
@@ -31,7 +31,6 @@ Imports:
     kableExtra,
     knitr,
     optparse,
-    rlang,
     rmarkdown,
     stringr,
     stringi,
@@ -39,12 +38,11 @@ Imports:
     xfun,
 Suggests:
     testthat
-RoxygenNote: 7.3.1
+RoxygenNote: 7.2.3
 Collate:
-    'repcred-package.R'
+    'repcred.R'
     'cdr3_check.R'
     'repcred-core.R'
-    'repcred.R'
     'report-functions.R'
     'sumrep_stats.R'
     'ui_edit.R'
