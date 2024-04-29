@@ -287,7 +287,7 @@ knitr::kable(length_info)
 # Annotation Calls Statistics
 
 
-```{r calls info}
+```{r calls_info}
 v_usage_info <- getGeneAlleleStat(repertoire, reference = germline_reference, call = "v_call")
 d_usage_info <- data.frame()
 if (any(!is.na(repertoire[["d_call"]]))) {
@@ -324,7 +324,7 @@ ggplot2::ggplot(appearance_info,
   #ggplot2::theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
   ggplot2::labs(x = "", y = "# of unique alleles") +
   ggplot2::facet_wrap(vars(!! sym("segment")), nrow = 1, 
-                      ncol = 3,
+                      ncol = length(unique(appearance_info[["segment"]])),
                       scales = "free") + ggplot2::coord_flip()
 
 ```
@@ -346,7 +346,7 @@ ggplot2::ggplot(usage_info,
   #ggplot2::theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
   ggplot2::labs(x = "", y = "Relative usage") +
   ggplot2::facet_wrap(vars(!! sym("segment")), nrow = 1, 
-                      ncol = 3,
+                      ncol = length(unique(usage_info[["segment"]])),
                       scales = "free") + ggplot2::coord_flip()
 
 ```
