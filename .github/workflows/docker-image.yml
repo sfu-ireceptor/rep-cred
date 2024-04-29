@@ -111,7 +111,8 @@ jobs:
     strategy:
        matrix:
           TEST_DATA: [
-              "test_repertoires/airr-covid-19.tsv"
+              "test_repertoires/airr-covid-19.tsv",
+              "test_repertoires/1434_exp_RLQ_pos_beta.tsv"
           ]
           FORMAT: [
               "html",
