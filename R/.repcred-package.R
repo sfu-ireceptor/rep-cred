@@ -5,15 +5,14 @@
 #' @import      ggplot2
 #' @import      stringr
 #' @import      dplyr
-#' @import      optparse
 #' @importFrom  airr        read_rearrangement write_rearrangement validate_airr
 #' @importFrom  Biostrings  reverseComplement DNAString pairwiseAlignment nucleotideSubstitutionMatrix vcountPattern DNAStringSet
 #' @importFrom  knitr       kable 
-#' @importFrom  data.table  as.data.table data.table
+#' @importFrom  data.table  as.data.table data.table .SD
 #' @importFrom  graphics    barplot abline arrows barplot hist
-#' @importFrom  rlang       := sym syms enquo
 #' @importFrom  stats       na.omit quantile sd start
 #' @importFrom  utils       head
 #' @importFrom  ape         as.DNAbin GC.content
+#' @importFrom  rlang       := sym syms enquo
 NULL
 # @importFrom  stringr     str_replace str_replace_all str_match_all str_match str_split str_count str_length str_replace_all str_pad

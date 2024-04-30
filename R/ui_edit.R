@@ -1,21 +1,16 @@
 #' @include repcred.R
 NULL
 
-#' addTrafficLighting
-#' 
-#' addTrafficLighting
-#'  
-#' @param vector_of_colours   Colours
-#' @export
+# @export
 addTrafficLighting <- function(vector_of_colours){
    css_file = file("results/repcred.css")
-   
+
    div_main_css = "#div-main {
     position:fixed;
     top: calc(35%);
     left: calc(35%);
     }"
-   
+
    shiny_notif_css = ".shiny-notification {
     position:fixed;
     top: calc(55%);
@@ -26,20 +21,20 @@ addTrafficLighting <- function(vector_of_colours){
    line_list[1] = div_main_css
    line_list[2] = shiny_notif_css
    i=1
-   
+
    for(color in vector_of_colours){
     single_element_css = paste("li.chapter",as.character(i),"{",
                        "background:",as.character(color),";",
                        "}"
                        ,sep="")
-    
+
     line_list[i+2] = single_element_css
     i=i+1
-    
+
    }
    writeLines(line_list,css_file)
    close(css_file)
-   
+
  }
 
 #'
@@ -73,5 +68,15 @@ formattedErrorMeassage <- function(x) {
     txt <- paste('\n\n<div class="alert alert-danger">',
       gsub('##', '\n', gsub('^##\ Error', '**Error**', x)),
       '</div>', sep = '\n')
+    writeLines(txt)
+}
+
+#'
+#'
+#'
+formattedWarningMeassage <- function(x) {
+    txt <- paste('\n\n<div class="alert alert-warning">',
+                 gsub('##', '\n', gsub('^##\ Warning', '**Warning**', x)),
+                 '</div>', sep = '\n')
     writeLines(txt)
 }

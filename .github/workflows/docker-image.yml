@@ -25,7 +25,7 @@ jobs:
           ]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
@@ -68,20 +68,20 @@ jobs:
           echo "ARTIFACT_NAME=$artifact_name" >> $GITHUB_ENV
            
       - name: Archive results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "repcred-report_${{ env.ARTIFACT_NAME }}"
           path: |
             outdir/results
           
-  build:
+  build-container:
 
     runs-on: ubuntu-latest
     needs: R-CMD-check
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2      
       - name: Set up Docker Buildx
@@ -91,16 +91,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-          context: ./docker
-          file: ./docker/Dockerfile
-      - name: Build and export to Docker
-        uses: docker/build-push-action@v4
-        with:
-          context: ./docker
-          file: ./docker/Dockerfile
-          load: true
-          tags: rep-cred:test
-      - name: Build and push
+      - name: Build and push to Docker
         uses: docker/build-push-action@v4
         with:
           context: ./docker
@@ -109,3 +100,29 @@ jobs:
           no-cache: true
           tags: airrc/rep-cred:latest
           
+  test-container:
+
+    runs-on: ubuntu-latest
+    needs: build-container
+    
+    container:
+      image: airrc/rep-cred:latest
+    
+    strategy:
+       matrix:
+          TEST_DATA: [
+              "test_repertoires/airr-covid-19.tsv",
+              "test_repertoires/1434_exp_RLQ_pos_beta.tsv"
+          ]
+          FORMAT: [
+              "html",
+              "pdf"
+          ]
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Run repcred command
+        run: |
+           repcred -r ${{ matrix.TEST_DATA }} -o outdir -d TRUE -f ${{ matrix.FORMAT }}

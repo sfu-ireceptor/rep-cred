@@ -1,7 +1,7 @@
 Package: repcred
 Type: Package
 Version: 0.0.1
-Date: 2024-04-15
+Date: 2024-04-29
 Authors@R: c(person("Susanna", "Marquez", role=c("aut", "cre"), 
                     email="susanna.marquez@yale.edu"),
                      person("AIRR Community", role=c("cph")))
@@ -41,10 +41,9 @@ Suggests:
     testthat
 RoxygenNote: 7.3.1
 Collate:
-    'repcred-package.R'
+    'repcred.R'
     'cdr3_check.R'
     'repcred-core.R'
-    'repcred.R'
     'report-functions.R'
     'sumrep_stats.R'
     'ui_edit.R'

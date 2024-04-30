@@ -8,7 +8,7 @@
 
 # Include libraries and functions -----------------------------------------------------
 
-#' @include repcred-package.R
+#' @include repcred.R
 NULL
 
 ##########################################################################
@@ -42,12 +42,12 @@ checkCDR3 <- function(data) {
     cdr3_val = data[[cdr3]][row_count]
     junction_val = data[[junction]][row_count]
     if (!anyNA(cdr3_val)) {
-      cdr3_seqs = c(cdr3_seqs, cdr3_val)
+    cdr3_seqs = c(cdr3_seqs, cdr3_val)
       seq_ids_vector = c(seq_ids_vector, seq_id)
       row_number = c(row_number, row_count)
     } else{
-      if (!junction_val %in% c(NA, "")) {
-        cdr3_seqs = c(cdr3_seqs, junction_val)
+        if (!junction_val %in% c(NA, "")) {
+            cdr3_seqs = c(cdr3_seqs, junction_val)
         row_number = c(row_number, row_count)
         seq_ids_vector = c(seq_ids_vector, seq_id)
       } else{
@@ -62,6 +62,8 @@ checkCDR3 <- function(data) {
           seq_ids_vector = c(seq_ids_vector, seq_id)
         }
       }
+      
+      
     }
     
   }
@@ -181,13 +183,20 @@ plotVgeneDist <-
           main = paste("Number of occurences of V-gene calls"),
           las = 2
         )
+        
         writeLines("\n\n#### Data")
+        #cat('\n')
         print(knitr::kable(seq_data))
+        #cat('\n')
+        
         
         i = i + 1
       } else{
         i = i + 1
       }
       
+      
     }
+    
+    
   }

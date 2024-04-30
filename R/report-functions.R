@@ -1,5 +1,6 @@
 ##### rep-cred functions for index.Rmd
 #' @include repcred.R
+NULL
 
 ##########################################################################
 # color functions
@@ -166,10 +167,14 @@ findMissingColumns <- function(data) {
 #' @export
 getGeneAlleleStat <- function(repertoire, reference = NULL, call="v_call") {
   
+  repertoire <- repertoire %>% 
+      dplyr::select(!!as.name(call)) %>%
+      dplyr::filter(!!as.name(call)!="") %>%
+      dplyr::mutate( !!as.name(call) := alakazam::getAllele(!!as.name(call), first=F, collapse=T)) %>%
+      dplyr::mutate("allele" =  !!as.name(call)) 
+  
   ## get allele-call proportion
-  allele_data <- repertoire %>% dplyr::select(!!as.name(call)) %>%
-    dplyr::filter(!!as.name(call)!="") %>%
-    dplyr::mutate("allele" = !!as.name(call)) %>%
+  allele_data <- repertoire %>%
     tidyr::separate_rows(!!as.name("allele"), sep = ",") %>%
     dplyr::rowwise() %>%
     dplyr::mutate("proportion" = 1/(stringi::stri_count(!!as.name(call),regex = ",")+1)) %>%
@@ -179,9 +184,6 @@ getGeneAlleleStat <- function(repertoire, reference = NULL, call="v_call") {
   
   ## get gene-call proportion
   gene_data <- repertoire %>% 
-    dplyr::select(!!as.name(call)) %>%
-    dplyr::filter(!!as.name(call)!="") %>%
-    dplyr::rowwise() %>%
     dplyr::mutate("gene" = alakazam::getGene(!!as.name(call), first = F, collapse = T, 
                                              strip_d = F, omit_nl = F)) %>%
     dplyr::select(!!as.name("gene"), !!as.name(call)) %>%
@@ -195,13 +197,13 @@ getGeneAlleleStat <- function(repertoire, reference = NULL, call="v_call") {
                                                collapse = ","),
                      "count_unique_alleles" = stringi::stri_count(!!as.name("unique_alleles"),regex = ",")+1)
   
-  if(!is.null(reference)){
+  if (!is.null(reference)) {
     
     call_region <- substr(gene_data$gene[1],1,4)
     
     alleles <- grep(call_region, names(reference), value=T)
     
-    if(length(alleles)!=0){
+    if (length(alleles)!=0) {
       genes <- alakazam::getGene(alleles, first = F, collapse = T, 
                                  strip_d = F, omit_nl = F)
       

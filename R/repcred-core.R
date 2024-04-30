@@ -43,7 +43,7 @@ repcred_report <- function(rep, outdir=NULL,genome_file=NULL, downsample=TRUE, f
     
     tryCatch(
         {
-            report_path <- render_report(rep, outdir,genome_file,downsample, format)
+            report_path <- render_report(rep, outdir, genome_file, downsample, format)
         },
         error = function(e) {
             stop(safeError(e))
@@ -97,12 +97,12 @@ getCoreStats <- function(data){
 #' 
 #' @param rep Path to repertoire 
 #' @param outdir Directory where the report will be generated
-#' @param genome  A reference set of the V(D)J alleles.
 #' @param downsample Whether report will downsample repertoire
+#' @param genome  A reference set of the V(D)J alleles.
 #' @param format Output format: html, pdf, all
 #' @export
-render_report <- function(rep,outdir,genome=NULL,downsample=TRUE, format=c("html","pdf","all")) {
-    path = "../rstudio/templates/project/project_files/"
+render_report <- function(rep,outdir,genome=NULL,downsample=TRUE,format=c("html","pdf","all")) {
+    # path = "../rstudio/templates/project/project_files/"
     format <- match.arg(format)
     if (!dir.exists(outdir)) {
         dir.create(outdir, recursive = T)
@@ -164,7 +164,7 @@ repcred_project <- function(path,...) {
     dir.create(project_dir, recursive = TRUE, showWarnings = FALSE)
     project_files <- list.files(skeleton_dir,full.names = T)
     file.copy(project_files, project_dir, recursive=TRUE)
-} 
+}
 
 
 

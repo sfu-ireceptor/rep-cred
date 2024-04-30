@@ -93,3 +93,12 @@ curl -k -s --data '{"filters":{"op":"=","content":{"field":"repertoire_id", "val
 ```
 
 inst/repcred.R -r test_repertoires/5edd817b7dd6ee5ee410772b.tsv -o tmp -d TRUE
+
+- 1434_exp_RLQ_pos_beta.tsv
+
+```
+curl -k -s --data '{"filters":{"op":"=","content":{"field":"repertoire_id", "value"
+:"5f07aa9039579433171763ce"}}, "format":"tsv", "size":5000}' https://covid19-1.ireceptor.org/airr/v1/rearrangement > 1434_exp_RLQ_pos_beta.tsv
+```
+
+inst/repcred.R -r test_repertoires/1434_exp_RLQ_pos_beta.tsv -o tmp -d TRUE
